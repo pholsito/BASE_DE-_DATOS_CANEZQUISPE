@@ -1,0 +1,243 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>PHOL | Base de Datos II — UPLA</title>
+    <link href="https://fonts.googleapis.com/css2?family=Space+Mono:wght@400;700&family=Syne:wght@400;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+<!-- PARTÍCULAS DE FONDO -->
+<div class="particles" id="particles"></div>
+
+<!-- NAVBAR -->
+<header class="navbar" id="navbar">
+    <div class="logo">
+        <div class="logo-icon">
+            <img src="images.png" alt="UPLA" onerror="this.style.display='none'">
+        </div>
+        <div class="logo-text">
+            <span class="logo-main">Base de Datos</span>
+            <span class="logo-sub">.II — UPLA</span>
+        </div>
+    </div>
+    <nav class="nav-links">
+        <a href="#inicio" class="nav-link">Inicio</a>
+        <a href="#sobre" class="nav-link">Perfil</a>
+        <a href="#semanas" class="nav-link">Semanas</a>
+        <button onclick="abrirAdmin()" class="btn-admin">
+            <span class="btn-icon">⚡</span> Admin
+        </button>
+    </nav>
+    <button class="hamburger" id="hamburger" onclick="toggleMenu()">
+        <span></span><span></span><span></span>
+    </button>
+</header>
+
+<!-- MENÚ MÓVIL -->
+<div class="mobile-menu" id="mobileMenu">
+    <a href="#inicio" onclick="toggleMenu()">Inicio</a>
+    <a href="#sobre" onclick="toggleMenu()">Perfil</a>
+    <a href="#semanas" onclick="toggleMenu()">Semanas</a>
+    <button onclick="toggleMenu(); abrirAdmin()">⚡ Admin</button>
+</div>
+
+<!-- HERO -->
+<section id="inicio" class="hero">
+    <div class="hero-bg">
+        <img src="Taller_de_edición_en_la_UPLA,_Huancayo_01.jpg" alt="UPLA" onerror="this.parentElement.style.background='linear-gradient(135deg, #0a0f1e, #0d1f3c)'">
+        <div class="hero-overlay"></div>
+        <div class="hero-grid"></div>
+    </div>
+    <div class="hero-content">
+        <div class="hero-badge">🎓 Ingeniería de Sistemas y Computación</div>
+        <h1 class="hero-title">
+            <span class="title-line">PHOL</span>
+            <span class="title-line accent">ANTONI</span>
+        </h1>
+        <p class="hero-desc">Repositorio académico de trabajos y proyectos del curso de Base de Datos II. Un archivo vivo de aprendizaje y progreso constante.</p>
+        <div class="hero-btns">
+            <a href="#semanas" class="btn-primary">Ver Repositorio →</a>
+            <a href="#sobre" class="btn-ghost">Mi Perfil</a>
+        </div>
+        <div class="hero-stats">
+            <div class="stat"><span id="statSemanas">0</span><small>Semanas</small></div>
+            <div class="stat"><span id="statTrabajos">0</span><small>Trabajos</small></div>
+            <div class="stat"><span>UPLA</span><small>Institución</small></div>
+        </div>
+    </div>
+</section>
+
+<!-- SOBRE MÍ -->
+<section id="sobre" class="sobre">
+    <div class="container">
+        <div class="section-header">
+            <span class="section-tag">// about_me</span>
+            <h2>Perfil</h2>
+        </div>
+        <div class="sobre-card">
+            <div class="foto-wrap">
+                <div class="foto-frame">
+                    <img src="WhatsApp Image 2025-09-29 at 10.46.00 PM.jpeg" class="foto" alt="Phol Antoni" onerror="this.src='data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 width=%22200%22 height=%22200%22><rect fill=%22%230d1f3c%22 width=%22200%22 height=%22200%22/><text fill=%22%2300f3ff%22 font-size=%2280%22 x=%2250%25%22 y=%2255%25%22 text-anchor=%22middle%22>👨‍💻</text></svg>'">
+                </div>
+                <div class="foto-glow"></div>
+            </div>
+            <div class="sobre-info">
+                <h3>Phol Antoni Canez Quispe</h3>
+                <div class="info-chips">
+                    <span class="chip">🎓 Estudiante UPLA</span>
+                    <span class="chip">💻 Ing. Sistemas</span>
+                    <span class="chip">📍 Huancayo, Perú</span>
+                </div>
+                <p>Estudiante en constante aprendizaje, siempre buscando mejorar en cada trabajo que realizo. Me esfuerzo por cumplir mis metas y dar lo mejor de mí en cada proyecto.</p>
+                <div class="skills-grid">
+                    <div class="skill-item"><span>SQL Server</span><div class="skill-bar"><div style="width:75%"></div></div></div>
+                    <div class="skill-item"><span>Base de Datos</span><div class="skill-bar"><div style="width:80%"></div></div></div>
+                    <div class="skill-item"><span>Modelado ER</span><div class="skill-bar"><div style="width:70%"></div></div></div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- SEMANAS / REPOSITORIO -->
+<section id="semanas" class="semanas">
+    <div class="container">
+        <div class="section-header">
+            <span class="section-tag">// repositorio</span>
+            <h2>Semanas del Curso</h2>
+        </div>
+
+        <!-- FILTROS -->
+        <div class="filtros">
+            <button class="filtro-btn active" onclick="filtrarSemana('all', this)">Todas</button>
+            <div id="filtrosBtns"></div>
+        </div>
+
+        <!-- GRID DE SEMANAS -->
+        <div id="gridSemanas" class="semanas-grid">
+            <div class="loading-state">
+                <div class="spinner"></div>
+                <p>Cargando trabajos...</p>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- MODAL ADMIN -->
+<div id="modalAdmin" class="modal-overlay" onclick="cerrarAdmin(event)">
+    <div class="modal-box">
+        <!-- LOGIN -->
+        <div id="panelLogin" class="panel">
+            <div class="modal-header">
+                <span class="modal-icon">🔐</span>
+                <h2>Acceso Administrativo</h2>
+                <p>Ingresa tus credenciales para continuar</p>
+            </div>
+            <div class="form-group">
+                <label>Usuario</label>
+                <input type="text" id="inputUser" placeholder="admin" autocomplete="off">
+            </div>
+            <div class="form-group">
+                <label>Contraseña</label>
+                <div class="input-pass">
+                    <input type="password" id="inputPass" placeholder="••••••••" onkeydown="if(event.key==='Enter')verificarLogin()">
+                    <button onclick="togglePass()" class="btn-eye">👁</button>
+                </div>
+            </div>
+            <div id="loginError" class="error-msg"></div>
+            <button onclick="verificarLogin()" class="btn-login">Ingresar al Sistema</button>
+            <button onclick="cerrarAdmin()" class="btn-close-modal">✕ Cerrar</button>
+        </div>
+
+        <!-- PANEL ADMIN -->
+        <div id="panelControl" class="panel" style="display:none">
+            <div class="modal-header">
+                <span class="modal-icon">⚡</span>
+                <h2>Panel de Control</h2>
+                <p>Gestión de trabajos del repositorio</p>
+            </div>
+
+            <!-- TABS -->
+            <div class="tabs">
+                <button class="tab active" onclick="switchTab('subir', this)">📤 Subir Trabajo</button>
+                <button class="tab" onclick="switchTab('lista', this)">📋 Mis Trabajos</button>
+            </div>
+
+            <!-- TAB: SUBIR -->
+            <div id="tabSubir" class="tab-content">
+                <div class="form-group">
+                    <label>Semana</label>
+                    <select id="admSemana">
+                        <option value="">Selecciona una semana...</option>
+                        <option value="Semana 1">Semana 1</option><option value="Semana 2">Semana 2</option>
+                        <option value="Semana 3">Semana 3</option><option value="Semana 4">Semana 4</option>
+                        <option value="Semana 5">Semana 5</option><option value="Semana 6">Semana 6</option>
+                        <option value="Semana 7">Semana 7</option><option value="Semana 8">Semana 8</option>
+                        <option value="Semana 9">Semana 9</option><option value="Semana 10">Semana 10</option>
+                        <option value="Semana 11">Semana 11</option><option value="Semana 12">Semana 12</option>
+                        <option value="Semana 13">Semana 13</option><option value="Semana 14">Semana 14</option>
+                        <option value="Semana 15">Semana 15</option><option value="Semana 16">Semana 16</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label>Título del Trabajo</label>
+                    <input type="text" id="admTitulo" placeholder="Ej: Informe Técnico de Base de Datos">
+                </div>
+
+                <!-- TIPO SELECTOR -->
+                <div class="tipo-selector">
+                    <button class="tipo-btn active" id="btnTipoArchivo" onclick="setTipo('archivo')">📁 Subir Archivo</button>
+                    <button class="tipo-btn" id="btnTipoLink" onclick="setTipo('link')">🔗 Pegar Enlace</button>
+                </div>
+
+                <!-- ZONA ARCHIVO (drag & drop) -->
+                <div id="zonaArchivo">
+                    <div id="dropZone" class="drop-zone">
+                        <div class="drop-icon">☁️</div>
+                        <div class="drop-text">Arrastra tu archivo aquí</div>
+                        <div class="drop-sub">o haz clic para buscar</div>
+                        <div class="drop-tipos">PDF · Word · Excel · PowerPoint · Imágenes</div>
+                        <input type="file" id="inputFile" accept=".pdf,.doc,.docx,.ppt,.pptx,.xls,.xlsx,.jpg,.jpeg,.png,.txt" style="display:none">
+                    </div>
+                    <div id="archivoPreview"></div>
+                </div>
+
+                <!-- ZONA LINK -->
+                <div id="zonaLink" style="display:none">
+                    <div class="form-group">
+                        <label>URL del trabajo</label>
+                        <input type="url" id="admEnlace" placeholder="https://drive.google.com/... o https://pdf.ac/...">
+                        <small class="hint">✅ Soporta Google Drive, PDF.ac, Canva, GitHub, OneDrive, etc.</small>
+                    </div>
+                </div>
+
+                <div id="uploadMsg" class="upload-msg"></div>
+                <button onclick="subirTrabajo()" id="btnSubir" class="btn-upload">⬆ Publicar Trabajo</button>
+            </div>
+
+            <!-- TAB: LISTA -->
+            <div id="tabLista" class="tab-content" style="display:none">
+                <div id="listaAdmin" class="lista-admin">
+                    <div class="loading-state"><div class="spinner"></div><p>Cargando...</p></div>
+                </div>
+            </div>
+
+            <button onclick="cerrarSesion()" class="btn-logout">🚪 Cerrar Sesión</button>
+        </div>
+    </div>
+</div>
+
+<!-- TOAST -->
+<div id="toast" class="toast"></div>
+
+<footer class="footer">
+    <p>© 2025 Phol Antoni Canez Quispe — Base de Datos II, UPLA Huancayo</p>
+    <p class="footer-sub">Construido con ❤️ y mucho SQL</p>
+</footer>
+
+<script src="script.js"></script>
+</body>
+</html>
