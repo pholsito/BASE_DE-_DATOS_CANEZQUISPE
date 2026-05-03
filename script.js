@@ -13,7 +13,7 @@ const ADMIN_USER = "admin";
 const ADMIN_PASS = "admin"; 
 
 function verificarLogin() {
-    // Agregamos .trim() a ambos campos para evitar errores por espacios vacíos[cite: 2]
+    // Agregamos .trim() a ambos campos para evitar errores por espacios vacíos.
     const user = document.getElementById("inputUser")?.value.trim();
     const pass = document.getElementById("inputPass")?.value.trim();
     const errEl = document.getElementById("loginError");
