@@ -8,8 +8,8 @@ const STORAGE_BUCKET = "trabajos";
 // ============================================================
 // 🔐  CREDENCIALES ADMIN
 // ============================================================
-const ADMIN_USER = "admin";
-const ADMIN_PASS = "admin";
+const ADMIN_USER = "phol";
+const ADMIN_PASS = "1234";
 
 // ============================================================
 // 📋  TEMAS POR SEMANA
