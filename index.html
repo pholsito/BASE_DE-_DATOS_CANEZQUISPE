@@ -3,40 +3,1506 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>PHOL | Base de Datos II — UPLA</title>
-    <link href="https://fonts.googleapis.com/css2?family=Space+Mono:wght@400;700&family=Syne:wght@400;600;700;800&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="style.css">
+    <title>Phol Antoni | Base de Datos II — UPLA</title>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800;900&family=JetBrains+Mono:wght@400;500;700&family=Bebas+Neue&family=Exo+2:ital,wght@0,900;1,900&display=swap" rel="stylesheet">
+    <style>
+        /* ═══════════════════════════════════════════
+           VARIABLES & RESET
+        ═══════════════════════════════════════════ */
+        :root {
+            --bg: #050810;
+            --bg2: #080d1a;
+            --surface: #0d1428;
+            --surface2: #111c35;
+            --border: rgba(0, 212, 255, 0.12);
+            --border2: rgba(0, 212, 255, 0.25);
+            --cyan: #00d4ff;
+            --cyan2: #00f5c4;
+            --gold: #f0c040;
+            --text: #e8f0fe;
+            --text2: #8a9bc4;
+            --text3: #4a5a80;
+            --font: 'Outfit', sans-serif;
+            --mono: 'JetBrains Mono', monospace;
+            --display: 'Bebas Neue', cursive;
+            --serif: 'Exo 2', sans-serif;
+            --radius: 16px;
+            --radius-sm: 10px;
+            --glow: 0 0 30px rgba(0, 212, 255, 0.2);
+            --glow2: 0 0 60px rgba(0, 212, 255, 0.1);
+        }
+
+        *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+        html { scroll-behavior: smooth; }
+
+        body {
+            font-family: var(--font);
+            background: var(--bg);
+            color: var(--text);
+            overflow-x: hidden;
+            line-height: 1.6;
+        }
+
+        /* ═══════════════════════════════════════════
+           CANVAS BG + PARTICLES
+        ═══════════════════════════════════════════ */
+        #bgCanvas {
+            position: fixed;
+            inset: 0;
+            z-index: 0;
+            pointer-events: none;
+            opacity: 0.5;
+        }
+
+        /* ═══════════════════════════════════════════
+           NAVBAR
+        ═══════════════════════════════════════════ */
+        .navbar {
+            position: fixed;
+            top: 0; left: 0; right: 0;
+            z-index: 100;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 0 2.5rem;
+            height: 70px;
+            background: rgba(5, 8, 16, 0.85);
+            backdrop-filter: blur(20px);
+            border-bottom: 1px solid var(--border);
+            transition: all 0.3s ease;
+        }
+
+        .navbar.scrolled {
+            height: 60px;
+            box-shadow: 0 4px 30px rgba(0, 0, 0, 0.5);
+        }
+
+        .logo {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            text-decoration: none;
+        }
+
+        .logo-icon {
+            width: 38px; height: 38px;
+            border-radius: 10px;
+            border: 1px solid var(--border2);
+            overflow: hidden;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: var(--surface);
+        }
+
+        .logo-icon img { width: 100%; height: 100%; object-fit: contain; }
+
+        .logo-text { display: flex; flex-direction: column; line-height: 1.1; }
+
+        .logo-main {
+            font-family: var(--font);
+            font-weight: 700;
+            font-size: 0.95rem;
+            color: var(--text);
+            letter-spacing: 0.02em;
+        }
+
+        .logo-sub {
+            font-family: var(--mono);
+            font-size: 0.65rem;
+            color: var(--cyan);
+            letter-spacing: 0.1em;
+        }
+
+        .nav-links {
+            display: flex;
+            align-items: center;
+            gap: 0.25rem;
+        }
+
+        .nav-link {
+            font-family: var(--font);
+            font-weight: 500;
+            font-size: 0.875rem;
+            color: var(--text2);
+            text-decoration: none;
+            padding: 0.45rem 1rem;
+            border-radius: 8px;
+            transition: all 0.2s;
+            letter-spacing: 0.02em;
+        }
+
+        .nav-link:hover {
+            color: var(--cyan);
+            background: rgba(0, 212, 255, 0.07);
+        }
+
+        .btn-admin {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            font-family: var(--font);
+            font-weight: 600;
+            font-size: 0.8rem;
+            color: var(--bg);
+            background: var(--cyan);
+            border: none;
+            border-radius: 8px;
+            padding: 0.45rem 1.1rem;
+            cursor: pointer;
+            transition: all 0.2s;
+            letter-spacing: 0.04em;
+            text-transform: uppercase;
+        }
+
+        .btn-admin:hover {
+            background: var(--cyan2);
+            transform: translateY(-1px);
+            box-shadow: 0 4px 20px rgba(0, 212, 255, 0.4);
+        }
+
+        /* hamburger */
+        .hamburger {
+            display: none;
+            flex-direction: column;
+            gap: 5px;
+            background: none;
+            border: none;
+            cursor: pointer;
+            padding: 4px;
+        }
+
+        .hamburger span {
+            display: block;
+            width: 24px;
+            height: 2px;
+            background: var(--text);
+            border-radius: 2px;
+            transition: all 0.3s;
+        }
+
+        /* mobile menu */
+        .mobile-menu {
+            display: none;
+            position: fixed;
+            top: 70px; left: 0; right: 0;
+            background: rgba(8, 13, 26, 0.98);
+            backdrop-filter: blur(20px);
+            border-bottom: 1px solid var(--border);
+            z-index: 99;
+            padding: 1.5rem;
+            flex-direction: column;
+            gap: 0.5rem;
+        }
+
+        .mobile-menu.open { display: flex; }
+
+        .mobile-menu a, .mobile-menu button {
+            font-family: var(--font);
+            font-size: 1rem;
+            font-weight: 500;
+            color: var(--text);
+            text-decoration: none;
+            padding: 0.75rem 1rem;
+            border-radius: 10px;
+            border: none;
+            background: none;
+            cursor: pointer;
+            text-align: left;
+            transition: all 0.2s;
+        }
+
+        .mobile-menu a:hover, .mobile-menu button:hover {
+            background: var(--surface);
+            color: var(--cyan);
+        }
+
+        /* ═══════════════════════════════════════════
+           HERO
+        ═══════════════════════════════════════════ */
+        .hero {
+            position: relative;
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            overflow: hidden;
+        }
+
+        .hero-bg {
+            position: absolute;
+            inset: 0;
+            z-index: 1;
+        }
+
+        .hero-bg img {
+            width: 100%; height: 100%;
+            object-fit: cover;
+            filter: brightness(0.18) saturate(0.5);
+        }
+
+        .hero-overlay {
+            position: absolute;
+            inset: 0;
+            background: linear-gradient(135deg, rgba(5,8,16,0.92) 0%, rgba(0,80,120,0.3) 50%, rgba(5,8,16,0.95) 100%);
+        }
+
+        .hero-grid {
+            position: absolute;
+            inset: 0;
+            background-image:
+                linear-gradient(rgba(0,212,255,0.04) 1px, transparent 1px),
+                linear-gradient(90deg, rgba(0,212,255,0.04) 1px, transparent 1px);
+            background-size: 60px 60px;
+            mask-image: radial-gradient(ellipse 80% 80% at 50% 50%, black 30%, transparent 100%);
+        }
+
+        .hero-content {
+            position: relative;
+            z-index: 2;
+            max-width: 900px;
+            margin: 0 auto;
+            padding: 8rem 2.5rem 4rem;
+            text-align: center;
+        }
+
+        .hero-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            font-family: var(--mono);
+            font-size: 0.72rem;
+            color: var(--cyan);
+            background: rgba(0, 212, 255, 0.08);
+            border: 1px solid rgba(0, 212, 255, 0.2);
+            border-radius: 100px;
+            padding: 0.45rem 1.2rem;
+            letter-spacing: 0.08em;
+            text-transform: uppercase;
+            margin-bottom: 2rem;
+            animation: fadeInDown 0.8s ease both;
+        }
+
+        .hero-badge::before {
+            content: '';
+            width: 6px; height: 6px;
+            border-radius: 50%;
+            background: var(--cyan);
+            animation: pulse 2s infinite;
+        }
+
+        @keyframes pulse {
+            0%, 100% { opacity: 1; transform: scale(1); }
+            50% { opacity: 0.4; transform: scale(0.7); }
+        }
+
+        .hero-title {
+            font-family: var(--display);
+            font-size: clamp(5rem, 16vw, 13rem);
+            font-weight: 400;
+            line-height: 0.88;
+            letter-spacing: 0.06em;
+            margin-bottom: 1.2rem;
+            animation: fadeInUp 0.9s ease 0.1s both;
+        }
+
+        .title-line {
+            display: block;
+            color: var(--text);
+            text-shadow: 0 0 80px rgba(0,212,255,0.15);
+        }
+
+        .title-line.accent {
+            background: linear-gradient(135deg, var(--cyan) 0%, var(--cyan2) 60%, #a78bfa 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            filter: drop-shadow(0 0 30px rgba(0,212,255,0.4));
+        }
+
+        .hero-sub {
+            font-family: var(--serif);
+            font-style: italic;
+            font-weight: 900;
+            font-size: 1rem;
+            color: var(--text2);
+            margin-bottom: 2rem;
+            letter-spacing: 0.15em;
+            text-transform: uppercase;
+            animation: fadeInUp 0.9s ease 0.2s both;
+        }
+
+        .hero-desc {
+            font-size: 1.05rem;
+            color: var(--text2);
+            max-width: 560px;
+            margin: 0 auto 2.5rem;
+            font-weight: 300;
+            line-height: 1.75;
+            animation: fadeInUp 0.9s ease 0.3s both;
+        }
+
+        .hero-btns {
+            display: flex;
+            gap: 1rem;
+            justify-content: center;
+            flex-wrap: wrap;
+            margin-bottom: 3.5rem;
+            animation: fadeInUp 0.9s ease 0.4s both;
+        }
+
+        .btn-primary {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            font-family: var(--font);
+            font-weight: 600;
+            font-size: 0.9rem;
+            color: var(--bg);
+            background: linear-gradient(135deg, var(--cyan), var(--cyan2));
+            border: none;
+            border-radius: 12px;
+            padding: 0.85rem 2rem;
+            text-decoration: none;
+            cursor: pointer;
+            transition: all 0.25s;
+            letter-spacing: 0.02em;
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 30px rgba(0, 212, 255, 0.4);
+        }
+
+        .btn-ghost {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            font-family: var(--font);
+            font-weight: 500;
+            font-size: 0.9rem;
+            color: var(--text);
+            background: rgba(255,255,255,0.05);
+            border: 1px solid var(--border2);
+            border-radius: 12px;
+            padding: 0.85rem 2rem;
+            text-decoration: none;
+            cursor: pointer;
+            transition: all 0.25s;
+        }
+
+        .btn-ghost:hover {
+            background: rgba(0, 212, 255, 0.08);
+            border-color: var(--cyan);
+            color: var(--cyan);
+            transform: translateY(-2px);
+        }
+
+        .hero-stats {
+            display: flex;
+            justify-content: center;
+            gap: 3rem;
+            animation: fadeInUp 0.9s ease 0.5s both;
+        }
+
+        .stat {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 4px;
+        }
+
+        .stat span {
+            font-family: var(--font);
+            font-size: 2rem;
+            font-weight: 800;
+            color: var(--cyan);
+            line-height: 1;
+        }
+
+        .stat small {
+            font-family: var(--mono);
+            font-size: 0.65rem;
+            color: var(--text3);
+            text-transform: uppercase;
+            letter-spacing: 0.1em;
+        }
+
+        @keyframes fadeInDown {
+            from { opacity: 0; transform: translateY(-20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        @keyframes fadeInUp {
+            from { opacity: 0; transform: translateY(25px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        /* ═══════════════════════════════════════════
+           SECTIONS COMMON
+        ═══════════════════════════════════════════ */
+        .container {
+            max-width: 1100px;
+            margin: 0 auto;
+            padding: 0 2rem;
+        }
+
+        .section-header {
+            text-align: center;
+            margin-bottom: 3.5rem;
+        }
+
+        .section-tag {
+            display: inline-block;
+            font-family: var(--mono);
+            font-size: 0.72rem;
+            color: var(--cyan);
+            letter-spacing: 0.15em;
+            text-transform: uppercase;
+            margin-bottom: 0.75rem;
+            opacity: 0.8;
+        }
+
+        .section-header h2 {
+            font-family: var(--font);
+            font-size: clamp(2rem, 5vw, 3rem);
+            font-weight: 800;
+            color: var(--text);
+            letter-spacing: -0.02em;
+        }
+
+        .section-header p {
+            color: var(--text2);
+            font-size: 1rem;
+            margin-top: 0.5rem;
+            font-weight: 300;
+        }
+
+        /* ═══════════════════════════════════════════
+           SOBRE MÍ
+        ═══════════════════════════════════════════ */
+        .sobre {
+            position: relative;
+            z-index: 1;
+            padding: 6rem 0;
+        }
+
+        .sobre-card {
+            display: grid;
+            grid-template-columns: 300px 1fr;
+            gap: 4rem;
+            align-items: start;
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: 24px;
+            padding: 3rem;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .sobre-card::before {
+            content: '';
+            position: absolute;
+            top: -100px; right: -100px;
+            width: 300px; height: 300px;
+            background: radial-gradient(circle, rgba(0,212,255,0.08), transparent 70%);
+            pointer-events: none;
+        }
+
+        .foto-wrap {
+            position: relative;
+            display: flex;
+            justify-content: center;
+        }
+
+        .foto-frame {
+            width: 220px; height: 280px;
+            border-radius: 20px;
+            overflow: hidden;
+            border: 2px solid var(--border2);
+            position: relative;
+            z-index: 1;
+        }
+
+        .foto-frame img {
+            width: 100%; height: 100%;
+            object-fit: cover;
+            object-position: center top;
+        }
+
+        .foto-glow {
+            position: absolute;
+            bottom: -20px; left: 50%;
+            transform: translateX(-50%);
+            width: 180px; height: 40px;
+            background: var(--cyan);
+            filter: blur(40px);
+            opacity: 0.25;
+        }
+
+        .sobre-info h3 {
+            font-family: var(--font);
+            font-size: 1.75rem;
+            font-weight: 800;
+            color: var(--text);
+            margin-bottom: 1rem;
+            letter-spacing: -0.02em;
+        }
+
+        .info-chips {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 0.5rem;
+            margin-bottom: 1.5rem;
+        }
+
+        .chip {
+            display: inline-flex;
+            align-items: center;
+            gap: 5px;
+            font-family: var(--mono);
+            font-size: 0.72rem;
+            color: var(--cyan);
+            background: rgba(0, 212, 255, 0.08);
+            border: 1px solid rgba(0, 212, 255, 0.18);
+            border-radius: 100px;
+            padding: 0.3rem 0.9rem;
+            letter-spacing: 0.04em;
+        }
+
+        .sobre-info > p {
+            color: var(--text2);
+            font-size: 0.95rem;
+            line-height: 1.75;
+            margin-bottom: 2rem;
+            font-weight: 300;
+        }
+
+        .skills-grid { display: flex; flex-direction: column; gap: 1rem; }
+
+        .skill-item span {
+            display: block;
+            font-family: var(--mono);
+            font-size: 0.72rem;
+            color: var(--text2);
+            letter-spacing: 0.08em;
+            margin-bottom: 6px;
+            text-transform: uppercase;
+        }
+
+        .skill-bar {
+            height: 4px;
+            background: rgba(255,255,255,0.06);
+            border-radius: 100px;
+            overflow: hidden;
+        }
+
+        .skill-bar div {
+            height: 100%;
+            background: linear-gradient(90deg, var(--cyan), var(--cyan2));
+            border-radius: 100px;
+            transform: scaleX(0);
+            transform-origin: left;
+            transition: transform 1.2s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        .skill-bar div.animated { transform: scaleX(1); }
+
+        /* ═══════════════════════════════════════════
+           SEMANAS
+        ═══════════════════════════════════════════ */
+        .semanas {
+            position: relative;
+            z-index: 1;
+            padding: 4rem 0 6rem;
+        }
+
+        .filtros {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 0.5rem;
+            margin-bottom: 2.5rem;
+            justify-content: center;
+        }
+
+        .filtro-btn {
+            font-family: var(--mono);
+            font-size: 0.72rem;
+            font-weight: 500;
+            color: var(--text2);
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: 100px;
+            padding: 0.4rem 1rem;
+            cursor: pointer;
+            letter-spacing: 0.08em;
+            transition: all 0.2s;
+            text-transform: uppercase;
+        }
+
+        .filtro-btn:hover, .filtro-btn.active {
+            color: var(--bg);
+            background: var(--cyan);
+            border-color: var(--cyan);
+        }
+
+        .semanas-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+            gap: 1.5rem;
+        }
+
+        .semana-card {
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: var(--radius);
+            padding: 1.75rem;
+            transition: all 0.3s ease;
+            cursor: default;
+            position: relative;
+            overflow: hidden;
+            animation: fadeInUp 0.6s ease both;
+        }
+
+        .semana-card::before {
+            content: '';
+            position: absolute;
+            top: 0; left: 0; right: 0;
+            height: 2px;
+            background: linear-gradient(90deg, var(--cyan), var(--cyan2));
+            transform: scaleX(0);
+            transform-origin: left;
+            transition: transform 0.3s ease;
+        }
+
+        .semana-card:hover {
+            border-color: var(--border2);
+            transform: translateY(-4px);
+            box-shadow: var(--glow);
+        }
+
+        .semana-card:hover::before { transform: scaleX(1); }
+
+        .card-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 1rem;
+        }
+
+        .semana-num {
+            font-family: var(--mono);
+            font-size: 0.65rem;
+            color: var(--cyan);
+            background: rgba(0, 212, 255, 0.08);
+            border: 1px solid rgba(0, 212, 255, 0.18);
+            border-radius: 6px;
+            padding: 0.25rem 0.6rem;
+            letter-spacing: 0.1em;
+            text-transform: uppercase;
+        }
+
+        .semana-count {
+            font-family: var(--mono);
+            font-size: 0.65rem;
+            color: var(--text3);
+        }
+
+        .card-title {
+            font-family: var(--font);
+            font-size: 1rem;
+            font-weight: 700;
+            color: var(--text);
+            margin-bottom: 0.5rem;
+            line-height: 1.35;
+        }
+
+        .card-info {
+            font-size: 0.825rem;
+            color: var(--text2);
+            font-weight: 300;
+            margin-bottom: 1.25rem;
+            line-height: 1.5;
+        }
+
+        .tareas-list { display: flex; flex-direction: column; gap: 0.6rem; }
+
+        .tarea-link {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            font-family: var(--font);
+            font-size: 0.825rem;
+            font-weight: 500;
+            color: var(--text2);
+            text-decoration: none;
+            background: rgba(255,255,255,0.025);
+            border: 1px solid rgba(255,255,255,0.06);
+            border-radius: 10px;
+            padding: 0.65rem 0.9rem;
+            transition: all 0.2s;
+        }
+
+        .tarea-link:hover {
+            color: var(--cyan);
+            background: rgba(0, 212, 255, 0.06);
+            border-color: rgba(0, 212, 255, 0.2);
+            transform: translateX(4px);
+        }
+
+        .tarea-link .tarea-icon {
+            width: 26px; height: 26px;
+            border-radius: 7px;
+            background: rgba(0, 212, 255, 0.1);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.75rem;
+            flex-shrink: 0;
+        }
+
+        .tarea-link.disabled {
+            opacity: 0.4;
+            pointer-events: none;
+        }
+
+        .loading-state {
+            grid-column: 1 / -1;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 1rem;
+            padding: 4rem;
+            color: var(--text2);
+        }
+
+        .spinner {
+            width: 36px; height: 36px;
+            border: 2px solid var(--border);
+            border-top-color: var(--cyan);
+            border-radius: 50%;
+            animation: spin 0.8s linear infinite;
+        }
+
+        @keyframes spin { to { transform: rotate(360deg); } }
+
+        /* ═══════════════════════════════════════════
+           CHATBOT
+        ═══════════════════════════════════════════ */
+        .chat-fab {
+            position: fixed;
+            bottom: 2rem;
+            right: 2rem;
+            z-index: 200;
+        }
+
+        .chat-toggle {
+            width: 60px; height: 60px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, var(--cyan), var(--cyan2));
+            border: none;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.5rem;
+            box-shadow: 0 4px 25px rgba(0, 212, 255, 0.4);
+            transition: all 0.3s;
+            position: relative;
+        }
+
+        .chat-toggle:hover {
+            transform: scale(1.1);
+            box-shadow: 0 6px 35px rgba(0, 212, 255, 0.55);
+        }
+
+        .chat-ping {
+            position: absolute;
+            top: 2px; right: 2px;
+            width: 12px; height: 12px;
+            border-radius: 50%;
+            background: var(--gold);
+            border: 2px solid var(--bg);
+            animation: pingAnim 1.5s ease infinite;
+        }
+
+        @keyframes pingAnim {
+            0%, 100% { transform: scale(1); opacity: 1; }
+            50% { transform: scale(1.3); opacity: 0.7; }
+        }
+
+        .chat-window {
+            position: fixed;
+            bottom: 5.5rem;
+            right: 2rem;
+            z-index: 200;
+            width: 380px;
+            max-height: 540px;
+            background: var(--bg2);
+            border: 1px solid var(--border2);
+            border-radius: 20px;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.6), 0 0 40px rgba(0,212,255,0.1);
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+            transform: scale(0.85) translateY(20px);
+            opacity: 0;
+            pointer-events: none;
+            transition: all 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+            transform-origin: bottom right;
+        }
+
+        .chat-window.open {
+            transform: scale(1) translateY(0);
+            opacity: 1;
+            pointer-events: all;
+        }
+
+        .chat-header {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 1rem 1.25rem;
+            background: var(--surface);
+            border-bottom: 1px solid var(--border);
+        }
+
+        .chat-avatar {
+            width: 36px; height: 36px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, var(--cyan), var(--cyan2));
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1rem;
+            flex-shrink: 0;
+        }
+
+        .chat-header-info { flex: 1; }
+
+        .chat-header-name {
+            font-family: var(--font);
+            font-weight: 700;
+            font-size: 0.875rem;
+            color: var(--text);
+        }
+
+        .chat-header-status {
+            font-family: var(--mono);
+            font-size: 0.65rem;
+            color: var(--cyan2);
+            letter-spacing: 0.05em;
+            display: flex;
+            align-items: center;
+            gap: 5px;
+        }
+
+        .chat-header-status::before {
+            content: '';
+            width: 5px; height: 5px;
+            border-radius: 50%;
+            background: var(--cyan2);
+        }
+
+        .chat-close {
+            background: none;
+            border: none;
+            color: var(--text3);
+            cursor: pointer;
+            font-size: 1.1rem;
+            padding: 4px;
+            border-radius: 6px;
+            transition: all 0.2s;
+            line-height: 1;
+        }
+
+        .chat-close:hover { color: var(--text); background: rgba(255,255,255,0.06); }
+
+        .chat-messages {
+            flex: 1;
+            overflow-y: auto;
+            padding: 1.25rem;
+            display: flex;
+            flex-direction: column;
+            gap: 1rem;
+            scrollbar-width: thin;
+            scrollbar-color: var(--border) transparent;
+        }
+
+        .chat-messages::-webkit-scrollbar { width: 4px; }
+        .chat-messages::-webkit-scrollbar-thumb { background: var(--border); border-radius: 4px; }
+
+        .msg {
+            max-width: 85%;
+            animation: msgFade 0.3s ease;
+        }
+
+        @keyframes msgFade {
+            from { opacity: 0; transform: translateY(8px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .msg.bot { align-self: flex-start; }
+        .msg.user { align-self: flex-end; }
+
+        .msg-bubble {
+            padding: 0.75rem 1rem;
+            border-radius: 14px;
+            font-size: 0.84rem;
+            line-height: 1.55;
+        }
+
+        .msg.bot .msg-bubble {
+            background: var(--surface2);
+            border: 1px solid var(--border);
+            color: var(--text);
+            border-bottom-left-radius: 4px;
+        }
+
+        .msg.user .msg-bubble {
+            background: linear-gradient(135deg, rgba(0,212,255,0.2), rgba(0,245,196,0.15));
+            border: 1px solid rgba(0,212,255,0.25);
+            color: var(--text);
+            border-bottom-right-radius: 4px;
+        }
+
+        .msg-time {
+            font-family: var(--mono);
+            font-size: 0.6rem;
+            color: var(--text3);
+            margin-top: 4px;
+            padding: 0 4px;
+        }
+
+        .msg.user .msg-time { text-align: right; }
+
+        .typing-indicator {
+            display: flex;
+            gap: 4px;
+            align-items: center;
+            padding: 0.75rem 1rem;
+            background: var(--surface2);
+            border: 1px solid var(--border);
+            border-radius: 14px;
+            border-bottom-left-radius: 4px;
+            width: fit-content;
+        }
+
+        .typing-dot {
+            width: 6px; height: 6px;
+            border-radius: 50%;
+            background: var(--text3);
+            animation: typingDot 1.2s infinite ease;
+        }
+
+        .typing-dot:nth-child(2) { animation-delay: 0.2s; }
+        .typing-dot:nth-child(3) { animation-delay: 0.4s; }
+
+        @keyframes typingDot {
+            0%, 80%, 100% { transform: scale(0.7); opacity: 0.4; }
+            40% { transform: scale(1); opacity: 1; }
+        }
+
+        .chat-suggestions {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 0.4rem;
+            padding: 0 1.25rem 0.75rem;
+        }
+
+        .suggestion-btn {
+            font-family: var(--font);
+            font-size: 0.72rem;
+            color: var(--cyan);
+            background: rgba(0, 212, 255, 0.07);
+            border: 1px solid rgba(0, 212, 255, 0.18);
+            border-radius: 100px;
+            padding: 0.3rem 0.8rem;
+            cursor: pointer;
+            transition: all 0.2s;
+            white-space: nowrap;
+        }
+
+        .suggestion-btn:hover {
+            background: rgba(0, 212, 255, 0.15);
+            border-color: var(--cyan);
+        }
+
+        .chat-input-area {
+            display: flex;
+            gap: 8px;
+            padding: 1rem 1.25rem;
+            border-top: 1px solid var(--border);
+            background: var(--surface);
+        }
+
+        .chat-input {
+            flex: 1;
+            font-family: var(--font);
+            font-size: 0.875rem;
+            color: var(--text);
+            background: var(--bg);
+            border: 1px solid var(--border);
+            border-radius: 10px;
+            padding: 0.65rem 1rem;
+            outline: none;
+            transition: border-color 0.2s;
+        }
+
+        .chat-input:focus { border-color: var(--cyan); }
+        .chat-input::placeholder { color: var(--text3); }
+
+        .chat-send {
+            width: 40px; height: 40px;
+            border-radius: 10px;
+            background: linear-gradient(135deg, var(--cyan), var(--cyan2));
+            border: none;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1rem;
+            transition: all 0.2s;
+            flex-shrink: 0;
+        }
+
+        .chat-send:hover { transform: scale(1.05); box-shadow: 0 4px 15px rgba(0,212,255,0.4); }
+        .chat-send:disabled { opacity: 0.5; cursor: not-allowed; transform: none; }
+
+        /* ═══════════════════════════════════════════
+           MODAL ADMIN
+        ═══════════════════════════════════════════ */
+        .modal-overlay {
+            position: fixed;
+            inset: 0;
+            z-index: 300;
+            background: rgba(0,0,0,0.75);
+            backdrop-filter: blur(8px);
+            display: none;
+            align-items: center;
+            justify-content: center;
+            padding: 1rem;
+        }
+
+        .modal-overlay.open { display: flex; }
+
+        .modal-box {
+            background: var(--bg2);
+            border: 1px solid var(--border2);
+            border-radius: 24px;
+            width: 100%;
+            max-width: 520px;
+            max-height: 90vh;
+            overflow-y: auto;
+            padding: 2.5rem;
+            animation: fadeInUp 0.3s ease;
+            scrollbar-width: thin;
+            scrollbar-color: var(--border) transparent;
+        }
+
+        .modal-header { text-align: center; margin-bottom: 2rem; }
+
+        .modal-icon {
+            display: block;
+            font-size: 2.5rem;
+            margin-bottom: 0.75rem;
+        }
+
+        .modal-header h2 {
+            font-family: var(--font);
+            font-size: 1.5rem;
+            font-weight: 800;
+            color: var(--text);
+            margin-bottom: 0.25rem;
+        }
+
+        .modal-header p {
+            color: var(--text2);
+            font-size: 0.875rem;
+            font-weight: 300;
+        }
+
+        .form-group { margin-bottom: 1.25rem; }
+
+        .form-group label {
+            display: block;
+            font-family: var(--mono);
+            font-size: 0.7rem;
+            color: var(--text2);
+            letter-spacing: 0.1em;
+            text-transform: uppercase;
+            margin-bottom: 0.5rem;
+        }
+
+        .form-group input,
+        .form-group select {
+            width: 100%;
+            font-family: var(--font);
+            font-size: 0.9rem;
+            color: var(--text);
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: 10px;
+            padding: 0.75rem 1rem;
+            outline: none;
+            transition: border-color 0.2s;
+        }
+
+        .form-group input:focus,
+        .form-group select:focus { border-color: var(--cyan); }
+
+        .form-group select option { background: var(--surface); }
+
+        .input-pass { position: relative; }
+
+        .input-pass input { padding-right: 2.5rem; }
+
+        .btn-eye {
+            position: absolute;
+            right: 0.75rem;
+            top: 50%;
+            transform: translateY(-50%);
+            background: none;
+            border: none;
+            cursor: pointer;
+            font-size: 1rem;
+            padding: 4px;
+            line-height: 1;
+        }
+
+        .error-msg {
+            color: #ff6b6b;
+            font-family: var(--mono);
+            font-size: 0.75rem;
+            text-align: center;
+            margin-bottom: 0.75rem;
+            min-height: 1rem;
+        }
+
+        .btn-login {
+            width: 100%;
+            font-family: var(--font);
+            font-weight: 700;
+            font-size: 0.9rem;
+            color: var(--bg);
+            background: linear-gradient(135deg, var(--cyan), var(--cyan2));
+            border: none;
+            border-radius: 12px;
+            padding: 0.9rem;
+            cursor: pointer;
+            transition: all 0.25s;
+            letter-spacing: 0.03em;
+            margin-bottom: 0.75rem;
+        }
+
+        .btn-login:hover {
+            transform: translateY(-1px);
+            box-shadow: 0 6px 25px rgba(0,212,255,0.4);
+        }
+
+        .btn-close-modal {
+            width: 100%;
+            font-family: var(--font);
+            font-weight: 500;
+            font-size: 0.875rem;
+            color: var(--text2);
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            padding: 0.75rem;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .btn-close-modal:hover { color: var(--text); border-color: var(--text3); }
+
+        .tabs { display: flex; gap: 0.5rem; margin-bottom: 1.5rem; }
+
+        .tab {
+            flex: 1;
+            font-family: var(--font);
+            font-weight: 600;
+            font-size: 0.8rem;
+            color: var(--text2);
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: 10px;
+            padding: 0.65rem;
+            cursor: pointer;
+            transition: all 0.2s;
+            text-align: center;
+        }
+
+        .tab:hover { color: var(--cyan); border-color: var(--border2); }
+
+        .tab.active {
+            color: var(--bg);
+            background: var(--cyan);
+            border-color: var(--cyan);
+        }
+
+        .tab-content { display: none; }
+        .tab-content.active { display: block; }
+
+        .tipo-selector {
+            display: flex;
+            gap: 0.5rem;
+            margin-bottom: 1.25rem;
+        }
+
+        .tipo-btn {
+            flex: 1;
+            font-family: var(--font);
+            font-weight: 500;
+            font-size: 0.8rem;
+            color: var(--text2);
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: 10px;
+            padding: 0.6rem;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .tipo-btn.active {
+            color: var(--cyan);
+            border-color: var(--cyan);
+            background: rgba(0,212,255,0.07);
+        }
+
+        .drop-zone {
+            border: 2px dashed var(--border2);
+            border-radius: 12px;
+            padding: 2.5rem 1.5rem;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.2s;
+            margin-bottom: 1rem;
+        }
+
+        .drop-zone:hover { border-color: var(--cyan); background: rgba(0,212,255,0.04); }
+
+        .drop-zone.dragover { border-color: var(--cyan2); background: rgba(0,245,196,0.06); }
+
+        .drop-icon { font-size: 2rem; margin-bottom: 0.5rem; }
+
+        .drop-text {
+            font-family: var(--font);
+            font-weight: 600;
+            font-size: 0.9rem;
+            color: var(--text);
+            margin-bottom: 0.25rem;
+        }
+
+        .drop-sub { font-size: 0.8rem; color: var(--text3); margin-bottom: 0.5rem; }
+
+        .drop-tipos {
+            font-family: var(--mono);
+            font-size: 0.65rem;
+            color: var(--text3);
+            letter-spacing: 0.06em;
+        }
+
+        .archivo-preview {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 0.75rem 1rem;
+            background: rgba(0,245,196,0.06);
+            border: 1px solid rgba(0,245,196,0.2);
+            border-radius: 10px;
+            font-size: 0.82rem;
+            color: var(--cyan2);
+            margin-bottom: 1rem;
+        }
+
+        .hint {
+            display: block;
+            font-family: var(--mono);
+            font-size: 0.68rem;
+            color: var(--text3);
+            margin-top: 0.4rem;
+        }
+
+        .upload-msg {
+            text-align: center;
+            font-size: 0.82rem;
+            margin-bottom: 0.75rem;
+            min-height: 1.2em;
+        }
+
+        .btn-upload {
+            width: 100%;
+            font-family: var(--font);
+            font-weight: 700;
+            font-size: 0.9rem;
+            color: var(--bg);
+            background: linear-gradient(135deg, var(--cyan), var(--cyan2));
+            border: none;
+            border-radius: 12px;
+            padding: 0.9rem;
+            cursor: pointer;
+            transition: all 0.25s;
+        }
+
+        .btn-upload:hover {
+            transform: translateY(-1px);
+            box-shadow: 0 6px 25px rgba(0,212,255,0.4);
+        }
+
+        .lista-admin { display: flex; flex-direction: column; gap: 0.75rem; }
+
+        .admin-item {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 0.85rem 1rem;
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: 10px;
+        }
+
+        .admin-item-info { flex: 1; }
+
+        .admin-item-title {
+            font-family: var(--font);
+            font-size: 0.85rem;
+            font-weight: 600;
+            color: var(--text);
+        }
+
+        .admin-item-semana {
+            font-family: var(--mono);
+            font-size: 0.65rem;
+            color: var(--cyan);
+        }
+
+        .btn-delete {
+            background: none;
+            border: none;
+            color: var(--text3);
+            cursor: pointer;
+            padding: 6px;
+            border-radius: 6px;
+            font-size: 0.9rem;
+            transition: all 0.2s;
+        }
+
+        .btn-delete:hover { color: #ff6b6b; background: rgba(255,107,107,0.1); }
+
+        .btn-logout {
+            width: 100%;
+            font-family: var(--font);
+            font-weight: 500;
+            font-size: 0.875rem;
+            color: var(--text3);
+            background: none;
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            padding: 0.75rem;
+            cursor: pointer;
+            transition: all 0.2s;
+            margin-top: 1.5rem;
+        }
+
+        .btn-logout:hover { color: #ff6b6b; border-color: rgba(255,107,107,0.3); }
+
+        /* ═══════════════════════════════════════════
+           TOAST
+        ═══════════════════════════════════════════ */
+        .toast {
+            position: fixed;
+            bottom: 5rem;
+            left: 50%;
+            transform: translateX(-50%) translateY(20px);
+            z-index: 500;
+            font-family: var(--font);
+            font-size: 0.875rem;
+            font-weight: 500;
+            color: var(--bg);
+            background: var(--cyan);
+            border-radius: 100px;
+            padding: 0.65rem 1.5rem;
+            opacity: 0;
+            transition: all 0.35s ease;
+            white-space: nowrap;
+            pointer-events: none;
+        }
+
+        .toast.show {
+            opacity: 1;
+            transform: translateX(-50%) translateY(0);
+        }
+
+        .toast.error { background: #ff6b6b; }
+
+        /* ═══════════════════════════════════════════
+           FOOTER
+        ═══════════════════════════════════════════ */
+        footer {
+            position: relative;
+            z-index: 1;
+            border-top: 1px solid var(--border);
+            padding: 2rem;
+            text-align: center;
+        }
+
+        footer p {
+            font-family: var(--mono);
+            font-size: 0.72rem;
+            color: var(--text3);
+            letter-spacing: 0.06em;
+        }
+
+        footer .footer-sub {
+            margin-top: 0.25rem;
+            color: var(--text3);
+        }
+
+        footer .footer-sub span { color: var(--cyan); }
+
+        /* ═══════════════════════════════════════════
+           RESPONSIVE
+        ═══════════════════════════════════════════ */
+        @media (max-width: 768px) {
+            .nav-links { display: none; }
+            .hamburger { display: flex; }
+            .sobre-card { grid-template-columns: 1fr; gap: 2rem; }
+            .foto-wrap { justify-content: flex-start; }
+            .hero-stats { gap: 1.5rem; }
+            .chat-window { width: calc(100vw - 2rem); right: 1rem; bottom: 5rem; }
+            .semanas-grid { grid-template-columns: 1fr; }
+        }
+    </style>
 </head>
 <body>
 
-<!-- PARTÍCULAS DE FONDO -->
-<div class="particles" id="particles"></div>
+<!-- BG CANVAS -->
+<canvas id="bgCanvas"></canvas>
 
 <!-- NAVBAR -->
 <header class="navbar" id="navbar">
-    <div class="logo">
+    <a href="#inicio" class="logo">
         <div class="logo-icon">
             <img src="images.png" alt="UPLA" onerror="this.style.display='none'">
         </div>
         <div class="logo-text">
-            <span class="logo-main">Base de Datos</span>
-            <span class="logo-sub">.II — UPLA</span>
+            <span class="logo-main">Base de Datos II</span>
+            <span class="logo-sub">UPLA · Huancayo</span>
         </div>
-    </div>
+    </a>
     <nav class="nav-links">
         <a href="#inicio" class="nav-link">Inicio</a>
         <a href="#sobre" class="nav-link">Perfil</a>
         <a href="#semanas" class="nav-link">Semanas</a>
-        <button onclick="abrirAdmin()" class="btn-admin">
-            <span class="btn-icon">⚡</span> Admin
-        </button>
+        <button onclick="abrirAdmin()" class="btn-admin">⚡ Admin</button>
     </nav>
-    <button class="hamburger" id="hamburger" onclick="toggleMenu()">
+    <button class="hamburger" id="hamburger" onclick="toggleMenu()" aria-label="Menú">
         <span></span><span></span><span></span>
     </button>
 </header>
 
-<!-- MENÚ MÓVIL -->
+<!-- MOBILE MENU -->
 <div class="mobile-menu" id="mobileMenu">
     <a href="#inicio" onclick="toggleMenu()">Inicio</a>
     <a href="#sobre" onclick="toggleMenu()">Perfil</a>
@@ -47,7 +1513,7 @@
 <!-- HERO -->
 <section id="inicio" class="hero">
     <div class="hero-bg">
-        <img src="Taller_de_edición_en_la_UPLA,_Huancayo_01.jpg" alt="UPLA" onerror="this.parentElement.style.background='linear-gradient(135deg, #0a0f1e, #0d1f3c)'">
+        <img src="Taller_de_edición_en_la_UPLA,_Huancayo_01.jpg" alt="UPLA Facultad de Ingeniería">
         <div class="hero-overlay"></div>
         <div class="hero-grid"></div>
     </div>
@@ -57,7 +1523,8 @@
             <span class="title-line">PHOL</span>
             <span class="title-line accent">ANTONI</span>
         </h1>
-        <p class="hero-desc">Repositorio académico de trabajos y proyectos del curso de Base de Datos II. Un archivo vivo de aprendizaje y progreso constante.</p>
+        <p class="hero-sub">Repositorio académico · Base de Datos II</p>
+        <p class="hero-desc">Un archivo vivo de trabajos, proyectos y aprendizaje continuo a lo largo del curso de Base de Datos II en la UPLA.</p>
         <div class="hero-btns">
             <a href="#semanas" class="btn-primary">Ver Repositorio →</a>
             <a href="#sobre" class="btn-ghost">Mi Perfil</a>
@@ -70,17 +1537,19 @@
     </div>
 </section>
 
-<!-- SOBRE MÍ -->
+<!-- PERFIL -->
 <section id="sobre" class="sobre">
     <div class="container">
         <div class="section-header">
             <span class="section-tag">// about_me</span>
-            <h2>Perfil</h2>
+            <h2>Mi Perfil</h2>
+            <p>Estudiante de Ingeniería de Sistemas, UPLA Huancayo</p>
         </div>
         <div class="sobre-card">
             <div class="foto-wrap">
                 <div class="foto-frame">
-                    <img src="WhatsApp Image 2025-09-29 at 10.46.00 PM.jpeg" class="foto" alt="Phol Antoni" onerror="this.src='data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 width=%22200%22 height=%22200%22><rect fill=%22%230d1f3c%22 width=%22200%22 height=%22200%22/><text fill=%22%2300f3ff%22 font-size=%2280%22 x=%2250%25%22 y=%2255%25%22 text-anchor=%22middle%22>👨‍💻</text></svg>'">
+                    <img src="WhatsApp_Image_2025-09-29_at_10_46_00_PM.jpeg" class="foto" alt="Phol Antoni Canez Quispe"
+                         onerror="this.src='data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 width=%22220%22 height=%22280%22><rect fill=%22%230d1428%22 width=%22220%22 height=%22280%22/><text fill=%22%2300d4ff%22 font-size=%22100%22 x=%2250%25%22 y=%2255%25%22 text-anchor=%22middle%22>👨‍💻</text></svg>'">
                 </div>
                 <div class="foto-glow"></div>
             </div>
@@ -91,32 +1560,38 @@
                     <span class="chip">💻 Ing. Sistemas</span>
                     <span class="chip">📍 Huancayo, Perú</span>
                 </div>
-                <p>Estudiante en constante aprendizaje, siempre buscando mejorar en cada trabajo que realizo. Me esfuerzo por cumplir mis metas y dar lo mejor de mí en cada proyecto.</p>
+                <p>Estudiante en constante aprendizaje, siempre buscando mejorar en cada trabajo que realizo. Me esfuerzo por cumplir mis metas y dar lo mejor de mí en cada proyecto académico y personal.</p>
                 <div class="skills-grid">
-                    <div class="skill-item"><span>SQL Server</span><div class="skill-bar"><div style="width:75%"></div></div></div>
-                    <div class="skill-item"><span>Base de Datos</span><div class="skill-bar"><div style="width:80%"></div></div></div>
-                    <div class="skill-item"><span>Modelado ER</span><div class="skill-bar"><div style="width:70%"></div></div></div>
+                    <div class="skill-item">
+                        <span>SQL Server</span>
+                        <div class="skill-bar"><div style="width:75%"></div></div>
+                    </div>
+                    <div class="skill-item">
+                        <span>Base de Datos</span>
+                        <div class="skill-bar"><div style="width:80%"></div></div>
+                    </div>
+                    <div class="skill-item">
+                        <span>Modelado ER</span>
+                        <div class="skill-bar"><div style="width:70%"></div></div>
+                    </div>
                 </div>
             </div>
         </div>
     </div>
 </section>
 
-<!-- SEMANAS / REPOSITORIO -->
+<!-- SEMANAS -->
 <section id="semanas" class="semanas">
     <div class="container">
         <div class="section-header">
             <span class="section-tag">// repositorio</span>
             <h2>Semanas del Curso</h2>
+            <p>Todos los trabajos organizados por semana</p>
         </div>
-
-        <!-- FILTROS -->
         <div class="filtros">
             <button class="filtro-btn active" onclick="filtrarSemana('all', this)">Todas</button>
-            <div id="filtrosBtns"></div>
+            <div id="filtrosBtns" style="display:contents"></div>
         </div>
-
-        <!-- GRID DE SEMANAS -->
         <div id="gridSemanas" class="semanas-grid">
             <div class="loading-state">
                 <div class="spinner"></div>
@@ -127,10 +1602,10 @@
 </section>
 
 <!-- MODAL ADMIN -->
-<div id="modalAdmin" class="modal-overlay" onclick="cerrarAdmin(event)">
+<div id="modalAdmin" class="modal-overlay" onclick="if(event.target===this)cerrarAdmin()">
     <div class="modal-box">
-        <!-- LOGIN -->
-        <div id="panelLogin" class="panel">
+        <!-- LOGIN PANEL -->
+        <div id="panelLogin">
             <div class="modal-header">
                 <span class="modal-icon">🔐</span>
                 <h2>Acceso Administrativo</h2>
@@ -152,50 +1627,37 @@
             <button onclick="cerrarAdmin()" class="btn-close-modal">✕ Cerrar</button>
         </div>
 
-        <!-- PANEL ADMIN -->
-        <div id="panelControl" class="panel" style="display:none">
+        <!-- ADMIN PANEL -->
+        <div id="panelControl" style="display:none">
             <div class="modal-header">
                 <span class="modal-icon">⚡</span>
                 <h2>Panel de Control</h2>
                 <p>Gestión de trabajos del repositorio</p>
             </div>
-
-            <!-- TABS -->
             <div class="tabs">
-                <button class="tab active" onclick="switchTab('subir', this)">📤 Subir Trabajo</button>
-                <button class="tab" onclick="switchTab('lista', this)">📋 Mis Trabajos</button>
+                <button class="tab active" onclick="switchTab('subir', this)">📤 Subir</button>
+                <button class="tab" onclick="switchTab('lista', this)">📋 Trabajos</button>
             </div>
 
-            <!-- TAB: SUBIR -->
-            <div id="tabSubir" class="tab-content">
+            <!-- TAB SUBIR -->
+            <div id="tabSubir" class="tab-content active">
                 <div class="form-group">
                     <label>Semana</label>
                     <select id="admSemana">
                         <option value="">Selecciona una semana...</option>
-                        <option value="Semana 1">Semana 1</option><option value="Semana 2">Semana 2</option>
-                        <option value="Semana 3">Semana 3</option><option value="Semana 4">Semana 4</option>
-                        <option value="Semana 5">Semana 5</option><option value="Semana 6">Semana 6</option>
-                        <option value="Semana 7">Semana 7</option><option value="Semana 8">Semana 8</option>
-                        <option value="Semana 9">Semana 9</option><option value="Semana 10">Semana 10</option>
-                        <option value="Semana 11">Semana 11</option><option value="Semana 12">Semana 12</option>
-                        <option value="Semana 13">Semana 13</option><option value="Semana 14">Semana 14</option>
-                        <option value="Semana 15">Semana 15</option><option value="Semana 16">Semana 16</option>
+                        <script>for(let i=1;i<=16;i++)document.write(`<option value="Semana ${i}">Semana ${i}</option>`)</script>
                     </select>
                 </div>
                 <div class="form-group">
                     <label>Título del Trabajo</label>
                     <input type="text" id="admTitulo" placeholder="Ej: Informe Técnico de Base de Datos">
                 </div>
-
-                <!-- TIPO SELECTOR -->
                 <div class="tipo-selector">
-                    <button class="tipo-btn active" id="btnTipoArchivo" onclick="setTipo('archivo')">📁 Subir Archivo</button>
-                    <button class="tipo-btn" id="btnTipoLink" onclick="setTipo('link')">🔗 Pegar Enlace</button>
+                    <button class="tipo-btn active" id="btnTipoArchivo" onclick="setTipo('archivo')">📁 Archivo</button>
+                    <button class="tipo-btn" id="btnTipoLink" onclick="setTipo('link')">🔗 Enlace</button>
                 </div>
-
-                <!-- ZONA ARCHIVO (drag & drop) -->
                 <div id="zonaArchivo">
-                    <div id="dropZone" class="drop-zone">
+                    <div id="dropZone" class="drop-zone" onclick="document.getElementById('inputFile').click()">
                         <div class="drop-icon">☁️</div>
                         <div class="drop-text">Arrastra tu archivo aquí</div>
                         <div class="drop-sub">o haz clic para buscar</div>
@@ -204,22 +1666,19 @@
                     </div>
                     <div id="archivoPreview"></div>
                 </div>
-
-                <!-- ZONA LINK -->
                 <div id="zonaLink" style="display:none">
                     <div class="form-group">
                         <label>URL del trabajo</label>
-                        <input type="url" id="admEnlace" placeholder="https://drive.google.com/... o https://pdf.ac/...">
-                        <small class="hint">✅ Soporta Google Drive, PDF.ac, Canva, GitHub, OneDrive, etc.</small>
+                        <input type="url" id="admEnlace" placeholder="https://drive.google.com/...">
+                        <small class="hint">✅ Google Drive, PDF.ac, Canva, GitHub, OneDrive</small>
                     </div>
                 </div>
-
                 <div id="uploadMsg" class="upload-msg"></div>
                 <button onclick="subirTrabajo()" id="btnSubir" class="btn-upload">⬆ Publicar Trabajo</button>
             </div>
 
-            <!-- TAB: LISTA -->
-            <div id="tabLista" class="tab-content" style="display:none">
+            <!-- TAB LISTA -->
+            <div id="tabLista" class="tab-content">
                 <div id="listaAdmin" class="lista-admin">
                     <div class="loading-state"><div class="spinner"></div><p>Cargando...</p></div>
                 </div>
@@ -230,14 +1689,662 @@
     </div>
 </div>
 
+<!-- CHATBOT -->
+<div class="chat-fab">
+    <div class="chat-window" id="chatWindow">
+        <div class="chat-header">
+            <div class="chat-avatar">🤖</div>
+            <div class="chat-header-info">
+                <div class="chat-header-name">DataBot UPLA</div>
+                <div class="chat-header-status">En línea · Base de Datos II</div>
+            </div>
+            <button class="chat-close" onclick="toggleChat()">✕</button>
+        </div>
+        <div class="chat-messages" id="chatMessages"></div>
+        <div class="chat-suggestions" id="chatSuggestions"></div>
+        <div class="chat-input-area">
+            <input class="chat-input" id="chatInput" type="text"
+                   placeholder="Pregunta sobre Base de Datos II..."
+                   onkeydown="if(event.key==='Enter')enviarMensaje()">
+            <button class="chat-send" id="chatSend" onclick="enviarMensaje()">➤</button>
+        </div>
+    </div>
+    <button class="chat-toggle" onclick="toggleChat()" title="Asistente IA">
+        <span id="chatIcon">💬</span>
+        <div class="chat-ping" id="chatPing"></div>
+    </button>
+</div>
+
 <!-- TOAST -->
 <div id="toast" class="toast"></div>
 
-<footer class="footer">
+<footer>
     <p>© 2025 Phol Antoni Canez Quispe — Base de Datos II, UPLA Huancayo</p>
-    <p class="footer-sub">Construido con ❤️ y mucho SQL</p>
+    <p class="footer-sub">Construido con ❤️ y mucho <span>SQL</span></p>
 </footer>
 
-<script src="script.js"></script>
+<script>
+/* ═══════════════════════════════════════════
+   CANVAS PARTICLES
+═══════════════════════════════════════════ */
+(function() {
+    const canvas = document.getElementById('bgCanvas');
+    const ctx = canvas.getContext('2d');
+    let W, H, particles = [], lines = [];
+
+    function resize() {
+        W = canvas.width = window.innerWidth;
+        H = canvas.height = window.innerHeight;
+    }
+
+    function createParticles() {
+        particles = [];
+        const count = Math.floor((W * H) / 18000);
+        for (let i = 0; i < count; i++) {
+            particles.push({
+                x: Math.random() * W,
+                y: Math.random() * H,
+                vx: (Math.random() - 0.5) * 0.3,
+                vy: (Math.random() - 0.5) * 0.3,
+                r: Math.random() * 1.5 + 0.5,
+                opacity: Math.random() * 0.5 + 0.1
+            });
+        }
+    }
+
+    function draw() {
+        ctx.clearRect(0, 0, W, H);
+        particles.forEach(p => {
+            p.x += p.vx; p.y += p.vy;
+            if (p.x < 0) p.x = W;
+            if (p.x > W) p.x = 0;
+            if (p.y < 0) p.y = H;
+            if (p.y > H) p.y = 0;
+
+            ctx.beginPath();
+            ctx.arc(p.x, p.y, p.r, 0, Math.PI * 2);
+            ctx.fillStyle = `rgba(0, 212, 255, ${p.opacity})`;
+            ctx.fill();
+        });
+
+        // Draw connections
+        for (let i = 0; i < particles.length; i++) {
+            for (let j = i + 1; j < particles.length; j++) {
+                const dx = particles[i].x - particles[j].x;
+                const dy = particles[i].y - particles[j].y;
+                const dist = Math.sqrt(dx * dx + dy * dy);
+                if (dist < 130) {
+                    ctx.beginPath();
+                    ctx.moveTo(particles[i].x, particles[i].y);
+                    ctx.lineTo(particles[j].x, particles[j].y);
+                    ctx.strokeStyle = `rgba(0, 212, 255, ${(1 - dist / 130) * 0.08})`;
+                    ctx.lineWidth = 0.5;
+                    ctx.stroke();
+                }
+            }
+        }
+        requestAnimationFrame(draw);
+    }
+
+    window.addEventListener('resize', () => { resize(); createParticles(); });
+    resize(); createParticles(); draw();
+})();
+
+/* ═══════════════════════════════════════════
+   NAVBAR SCROLL
+═══════════════════════════════════════════ */
+window.addEventListener('scroll', () => {
+    document.getElementById('navbar').classList.toggle('scrolled', window.scrollY > 50);
+});
+
+/* ═══════════════════════════════════════════
+   MOBILE MENU
+═══════════════════════════════════════════ */
+function toggleMenu() {
+    document.getElementById('mobileMenu').classList.toggle('open');
+}
+
+/* ═══════════════════════════════════════════
+   DATOS & RENDER
+═══════════════════════════════════════════ */
+const STORAGE_KEY = 'phol_db2_trabajos';
+const DATA_VERSION = 'v2_16semanas';
+let allData = {};
+let currentFilter = 'all';
+
+function getLocalData() {
+    try {
+        const ver = localStorage.getItem(STORAGE_KEY + '_ver');
+        if (ver !== DATA_VERSION) {
+            localStorage.removeItem(STORAGE_KEY);
+            localStorage.setItem(STORAGE_KEY + '_ver', DATA_VERSION);
+            return null;
+        }
+        const saved = localStorage.getItem(STORAGE_KEY);
+        return saved ? JSON.parse(saved) : null;
+    } catch { return null; }
+}
+
+function saveLocalData(data) {
+    localStorage.setItem(STORAGE_KEY, JSON.stringify(data));
+}
+
+async function loadData() {
+    const local = getLocalData();
+    if (local) {
+        allData = local;
+        renderAll();
+        return;
+    }
+    try {
+        const r = await fetch('datos.json');
+        const raw = await r.text();
+        // Handle duplicate JSON object issue in datos.json
+        const cleanJson = raw.trim();
+        const firstEnd = cleanJson.indexOf('}') + 1;
+        let parsed;
+        try {
+            parsed = JSON.parse(cleanJson.substring(0, firstEnd > cleanJson.length / 2 ? cleanJson.length : firstEnd));
+        } catch {
+            parsed = JSON.parse(cleanJson);
+        }
+        // If parsing gives a non-standard result, fallback
+        allData = parsed && typeof parsed === 'object' ? parsed : {};
+    } catch {
+        allData = getDefaultData();
+    }
+    renderAll();
+}
+
+function getDefaultData() {
+    return {
+        "Semana 1": {
+            "info": "Introducción a la base de datos",
+            "tareas": {
+                "1": { "titulo": "Informe Técnico", "enlace": "https://pdf.ac/QONm7fAQ0" },
+                "2": { "titulo": "Tipo de Arquitectura de base de datos", "enlace": "https://pdf.ac/jMfm6OxFcq" }
+            }
+        },
+        "Semana 2": {
+            "info": "Gestores de base de datos.",
+            "tareas": {
+                "1": { "titulo": "Diagrama de Entidad Relación", "enlace": "https://pdf.ac/ofEHoVEu" },
+                "2": { "titulo": "Manual de Instalación de SQL Server 2025 Developer Edition", "enlace": "https://pdf.ac/SnbDbYHOV" }
+            }
+        },
+        "Semana 3": {
+            "info": "Diseño de arquitectura de base de datos.",
+            "tareas": {
+                "1": { "titulo": "Diseño de arquitectura de base de datos", "enlace": "https://canva.link/xgfegwk4o2uuq37" }
+            }
+        },
+        "Semana 4": {
+            "info": "Manejo de Transacciones y Procedimientos Almacenados.",
+            "tareas": { "1": { "titulo": "Guía de Procedimientos", "enlace": "#" } }
+        },
+        "Semana 5": {
+            "info": "Triggers y Automatización de Procesos en BD.",
+            "tareas": {
+                "1": { "titulo": "Scripts de Automatización", "enlace": "#" },
+                "2": { "titulo": "Práctica Calificada", "enlace": "#" }
+            }
+        },
+        "Semana 6": {
+            "info": "Vistas, Funciones y Consultas Avanzadas.",
+            "tareas": { "1": { "titulo": "Informe de Vistas y Funciones", "enlace": "#" } }
+        },
+        "Semana 7": {
+            "info": "Seguridad y Control de Acceso en BD.",
+            "tareas": { "1": { "titulo": "Configuración de Roles y Permisos", "enlace": "#" } }
+        },
+        "Semana 8": {
+            "info": "Examen Parcial — Evaluación Integral.",
+            "tareas": { "1": { "titulo": "Examen Parcial", "enlace": "#" } }
+        },
+        "Semana 9": {
+            "info": "Optimización de Consultas e Índices.",
+            "tareas": { "1": { "titulo": "Informe de Optimización", "enlace": "#" } }
+        },
+        "Semana 10": {
+            "info": "Bases de Datos Distribuidas.",
+            "tareas": { "1": { "titulo": "Diseño de BD Distribuida", "enlace": "#" } }
+        },
+        "Semana 11": {
+            "info": "NoSQL — MongoDB y Bases de Datos no relacionales.",
+            "tareas": { "1": { "titulo": "Práctica con MongoDB", "enlace": "#" } }
+        },
+        "Semana 12": {
+            "info": "Data Warehousing y Business Intelligence.",
+            "tareas": { "1": { "titulo": "Diseño de Data Warehouse", "enlace": "#" } }
+        },
+        "Semana 13": {
+            "info": "Backup, Restauración y Alta Disponibilidad.",
+            "tareas": { "1": { "titulo": "Plan de Backup y Recuperación", "enlace": "#" } }
+        },
+        "Semana 14": {
+            "info": "Integración de BD con Aplicaciones Web.",
+            "tareas": { "1": { "titulo": "Conexión BD-Aplicación", "enlace": "#" } }
+        },
+        "Semana 15": {
+            "info": "Proyecto Final — Desarrollo e Implementación.",
+            "tareas": { "1": { "titulo": "Proyecto Final Integrador", "enlace": "#" } }
+        },
+        "Semana 16": {
+            "info": "Examen Final y Sustentación del Proyecto.",
+            "tareas": { "1": { "titulo": "Examen Final", "enlace": "#" } }
+        }
+    };
+}
+
+function getFileIcon(enlace) {
+    if (!enlace || enlace === '#') return '📄';
+    if (enlace.includes('canva')) return '🎨';
+    if (enlace.includes('drive.google')) return '📁';
+    if (enlace.includes('github')) return '💻';
+    if (enlace.includes('pdf')) return '📕';
+    if (enlace.includes('onedrive') || enlace.includes('sharepoint')) return '📘';
+    return '🔗';
+}
+
+function renderAll() {
+    const semanas = Object.keys(allData);
+    updateStats(semanas);
+    renderFiltros(semanas);
+    renderGrid(semanas);
+    animateSkillBars();
+    animateCounters();
+}
+
+function updateStats(semanas) {
+    let total = 0;
+    semanas.forEach(s => {
+        total += Object.keys(allData[s]?.tareas || {}).length;
+    });
+    document.getElementById('statSemanas').setAttribute('data-target', semanas.length);
+    document.getElementById('statTrabajos').setAttribute('data-target', total);
+}
+
+function renderFiltros(semanas) {
+    const container = document.getElementById('filtrosBtns');
+    container.innerHTML = semanas.map(s =>
+        `<button class="filtro-btn" onclick="filtrarSemana('${s}', this)">${s}</button>`
+    ).join('');
+}
+
+function filtrarSemana(filter, btn) {
+    currentFilter = filter;
+    document.querySelectorAll('.filtro-btn').forEach(b => b.classList.remove('active'));
+    btn.classList.add('active');
+    renderGrid(Object.keys(allData));
+}
+
+function renderGrid(semanas) {
+    const grid = document.getElementById('gridSemanas');
+    const filtered = currentFilter === 'all'
+        ? semanas
+        : semanas.filter(s => s === currentFilter);
+
+    if (filtered.length === 0) {
+        grid.innerHTML = `<div class="loading-state"><p>No hay semanas registradas aún.</p></div>`;
+        return;
+    }
+
+    grid.innerHTML = filtered.map((semana, idx) => {
+        const data = allData[semana];
+        const tareas = data?.tareas || {};
+        const tareaCount = Object.keys(tareas).length;
+        const tareasHTML = Object.entries(tareas).map(([k, t]) => {
+            const isDisabled = !t.enlace || t.enlace === '#';
+            return `<a href="${isDisabled ? '#' : t.enlace}" 
+                       class="tarea-link ${isDisabled ? 'disabled' : ''}"
+                       ${!isDisabled ? 'target="_blank" rel="noopener"' : ''}
+                       onclick="${isDisabled ? 'return false' : ''}">
+                <span class="tarea-icon">${getFileIcon(t.enlace)}</span>
+                <span>${t.titulo}</span>
+            </a>`;
+        }).join('');
+
+        return `<div class="semana-card" style="animation-delay:${idx * 0.07}s">
+            <div class="card-header">
+                <span class="semana-num">${semana}</span>
+                <span class="semana-count">${tareaCount} trabajo${tareaCount !== 1 ? 's' : ''}</span>
+            </div>
+            <div class="card-title">${data?.info || 'Contenido de la semana'}</div>
+            <div class="tareas-list">${tareasHTML}</div>
+        </div>`;
+    }).join('');
+}
+
+function animateSkillBars() {
+    setTimeout(() => {
+        document.querySelectorAll('.skill-bar div').forEach(bar => {
+            bar.classList.add('animated');
+        });
+    }, 600);
+}
+
+function animateCounters() {
+    const els = document.querySelectorAll('[data-target]');
+    els.forEach(el => {
+        const target = parseInt(el.getAttribute('data-target')) || 0;
+        let current = 0;
+        const step = Math.ceil(target / 30);
+        const interval = setInterval(() => {
+            current = Math.min(current + step, target);
+            el.textContent = current;
+            if (current >= target) clearInterval(interval);
+        }, 40);
+    });
+}
+
+/* ═══════════════════════════════════════════
+   ADMIN
+═══════════════════════════════════════════ */
+const CREDS = { user: 'phol', pass: 'upla2025' };
+let currentTipo = 'archivo';
+let selectedFile = null;
+
+function abrirAdmin() {
+    document.getElementById('modalAdmin').classList.add('open');
+}
+
+function cerrarAdmin() {
+    document.getElementById('modalAdmin').classList.remove('open');
+}
+
+function togglePass() {
+    const inp = document.getElementById('inputPass');
+    inp.type = inp.type === 'password' ? 'text' : 'password';
+}
+
+function verificarLogin() {
+    const u = document.getElementById('inputUser').value.trim();
+    const p = document.getElementById('inputPass').value;
+    const err = document.getElementById('loginError');
+    if (u === CREDS.user && p === CREDS.pass) {
+        document.getElementById('panelLogin').style.display = 'none';
+        document.getElementById('panelControl').style.display = 'block';
+        err.textContent = '';
+        cargarListaAdmin();
+    } else {
+        err.textContent = '⚠️ Credenciales incorrectas';
+        document.getElementById('inputPass').value = '';
+    }
+}
+
+function cerrarSesion() {
+    document.getElementById('panelControl').style.display = 'none';
+    document.getElementById('panelLogin').style.display = 'block';
+    document.getElementById('inputUser').value = '';
+    document.getElementById('inputPass').value = '';
+    cerrarAdmin();
+}
+
+function switchTab(tab, btn) {
+    document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+    btn.classList.add('active');
+    document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
+    document.getElementById('tab' + tab.charAt(0).toUpperCase() + tab.slice(1)).classList.add('active');
+    if (tab === 'lista') cargarListaAdmin();
+}
+
+function setTipo(tipo) {
+    currentTipo = tipo;
+    document.getElementById('btnTipoArchivo').classList.toggle('active', tipo === 'archivo');
+    document.getElementById('btnTipoLink').classList.toggle('active', tipo === 'link');
+    document.getElementById('zonaArchivo').style.display = tipo === 'archivo' ? 'block' : 'none';
+    document.getElementById('zonaLink').style.display = tipo === 'link' ? 'block' : 'none';
+}
+
+// Drop zone
+const dropZone = document.getElementById('dropZone');
+const inputFile = document.getElementById('inputFile');
+
+dropZone?.addEventListener('dragover', e => { e.preventDefault(); dropZone.classList.add('dragover'); });
+dropZone?.addEventListener('dragleave', () => dropZone.classList.remove('dragover'));
+dropZone?.addEventListener('drop', e => {
+    e.preventDefault();
+    dropZone.classList.remove('dragover');
+    if (e.dataTransfer.files[0]) handleFile(e.dataTransfer.files[0]);
+});
+inputFile?.addEventListener('change', () => { if (inputFile.files[0]) handleFile(inputFile.files[0]); });
+
+function handleFile(file) {
+    selectedFile = file;
+    document.getElementById('archivoPreview').innerHTML =
+        `<div class="archivo-preview">📎 ${file.name} <span style="color:var(--text3);margin-left:auto">${(file.size/1024).toFixed(1)} KB</span></div>`;
+}
+
+function subirTrabajo() {
+    const semana = document.getElementById('admSemana').value;
+    const titulo = document.getElementById('admTitulo').value.trim();
+    const msg = document.getElementById('uploadMsg');
+
+    if (!semana || !titulo) {
+        msg.style.color = '#ff6b6b';
+        msg.textContent = '⚠️ Completa todos los campos';
+        return;
+    }
+
+    let enlace = '#';
+    if (currentTipo === 'link') {
+        enlace = document.getElementById('admEnlace').value.trim() || '#';
+    }
+
+    if (!allData[semana]) allData[semana] = { info: semana, tareas: {} };
+    const keys = Object.keys(allData[semana].tareas);
+    const newKey = (keys.length + 1).toString();
+    allData[semana].tareas[newKey] = { titulo, enlace };
+    saveLocalData(allData);
+    renderAll();
+
+    msg.style.color = 'var(--cyan2)';
+    msg.textContent = '✅ Trabajo publicado correctamente';
+    document.getElementById('admTitulo').value = '';
+    document.getElementById('admEnlace') && (document.getElementById('admEnlace').value = '');
+    document.getElementById('archivoPreview').innerHTML = '';
+    selectedFile = null;
+    showToast('Trabajo publicado con éxito');
+    setTimeout(() => { msg.textContent = ''; }, 3000);
+}
+
+function cargarListaAdmin() {
+    const lista = document.getElementById('listaAdmin');
+    const items = [];
+    Object.entries(allData).forEach(([semana, data]) => {
+        Object.entries(data.tareas || {}).forEach(([k, t]) => {
+            items.push({ semana, key: k, titulo: t.titulo });
+        });
+    });
+    if (!items.length) {
+        lista.innerHTML = '<p style="color:var(--text3);text-align:center;padding:1rem">No hay trabajos aún</p>';
+        return;
+    }
+    lista.innerHTML = items.map((item, i) => `
+        <div class="admin-item" id="adminItem_${i}">
+            <div class="admin-item-info">
+                <div class="admin-item-title">${item.titulo}</div>
+                <div class="admin-item-semana">${item.semana}</div>
+            </div>
+            <button class="btn-delete" onclick="eliminarTrabajo('${item.semana}','${item.key}',${i})" title="Eliminar">🗑</button>
+        </div>`).join('');
+}
+
+function eliminarTrabajo(semana, key, idx) {
+    if (!confirm('¿Eliminar este trabajo?')) return;
+    delete allData[semana].tareas[key];
+    if (!Object.keys(allData[semana].tareas).length) delete allData[semana];
+    saveLocalData(allData);
+    renderAll();
+    cargarListaAdmin();
+    showToast('Trabajo eliminado');
+}
+
+/* ═══════════════════════════════════════════
+   TOAST
+═══════════════════════════════════════════ */
+function showToast(msg, isError = false) {
+    const t = document.getElementById('toast');
+    t.textContent = msg;
+    t.className = 'toast' + (isError ? ' error' : '');
+    requestAnimationFrame(() => t.classList.add('show'));
+    setTimeout(() => t.classList.remove('show'), 3000);
+}
+
+/* ═══════════════════════════════════════════
+   CHATBOT CON IA
+═══════════════════════════════════════════ */
+let chatOpen = false;
+let chatHistory = [];
+const suggestions = [
+    '¿Qué es un trigger?',
+    '¿Qué son los procedimientos almacenados?',
+    '¿Qué trabajos hay en Semana 1?',
+    'Explica normalización',
+    '¿Qué es SQL Server?'
+];
+
+function toggleChat() {
+    chatOpen = !chatOpen;
+    document.getElementById('chatWindow').classList.toggle('open', chatOpen);
+    document.getElementById('chatIcon').textContent = chatOpen ? '✕' : '💬';
+    document.getElementById('chatPing').style.display = chatOpen ? 'none' : 'block';
+    if (chatOpen && chatHistory.length === 0) initChat();
+}
+
+function initChat() {
+    chatHistory = [{
+        role: 'assistant',
+        content: `¡Hola! Soy **DataBot UPLA** 🤖\n\nSoy el asistente de **Phol Antoni** para el curso de Base de Datos II. Puedo ayudarte con:\n\n• Conceptos de BD (SQL, triggers, procedimientos)\n• Información del repositorio y trabajos\n• Consultas sobre el curso\n\n¿En qué te puedo ayudar?`
+    }];
+    renderMessages();
+    renderSuggestions();
+}
+
+function renderMessages() {
+    const container = document.getElementById('chatMessages');
+    container.innerHTML = chatHistory.map(m => {
+        const time = new Date().toLocaleTimeString('es', { hour: '2-digit', minute: '2-digit' });
+        const text = m.content
+            .replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>')
+            .replace(/\n/g, '<br>');
+        return `<div class="msg ${m.role === 'assistant' ? 'bot' : 'user'}">
+            <div class="msg-bubble">${text}</div>
+            <div class="msg-time">${time}</div>
+        </div>`;
+    }).join('');
+    container.scrollTop = container.scrollHeight;
+}
+
+function renderSuggestions() {
+    const container = document.getElementById('chatSuggestions');
+    if (chatHistory.length > 3) { container.innerHTML = ''; return; }
+    container.innerHTML = suggestions.map(s =>
+        `<button class="suggestion-btn" onclick="useSuggestion('${s}')">${s}</button>`
+    ).join('');
+}
+
+function useSuggestion(text) {
+    document.getElementById('chatInput').value = text;
+    enviarMensaje();
+}
+
+function showTyping() {
+    const container = document.getElementById('chatMessages');
+    const div = document.createElement('div');
+    div.className = 'msg bot'; div.id = 'typingMsg';
+    div.innerHTML = `<div class="typing-indicator">
+        <div class="typing-dot"></div>
+        <div class="typing-dot"></div>
+        <div class="typing-dot"></div>
+    </div>`;
+    container.appendChild(div);
+    container.scrollTop = container.scrollHeight;
+}
+
+function hideTyping() {
+    const el = document.getElementById('typingMsg');
+    if (el) el.remove();
+}
+
+async function enviarMensaje() {
+    const input = document.getElementById('chatInput');
+    const text = input.value.trim();
+    if (!text) return;
+
+    input.value = '';
+    document.getElementById('chatSend').disabled = true;
+
+    chatHistory.push({ role: 'user', content: text });
+    renderMessages();
+    showTyping();
+
+    // Build context about the repo
+    const repoInfo = Object.entries(allData).map(([sem, data]) => {
+        const tareas = Object.values(data.tareas || {}).map(t => t.titulo).join(', ');
+        return `${sem}: ${data.info}. Trabajos: ${tareas}`;
+    }).join('\n');
+
+    const systemPrompt = `Eres DataBot UPLA, el asistente académico del repositorio de Phol Antoni Canez Quispe, estudiante de Ingeniería de Sistemas en la UPLA (Universidad Peruana Los Andes) de Huancayo, Perú. Estás integrado en su portafolio del curso Base de Datos II.
+
+REPOSITORIO ACTUAL:
+${repoInfo}
+
+INSTRUCCIONES:
+- Responde en español, de forma amigable pero técnica y precisa
+- Usa markdown simple (** para negrita)
+- Cuando pregunten por trabajos, menciona los que hay en el repositorio
+- Si pregunten sobre SQL, BD, triggers, procedimientos almacenados, normalización, etc., da respuestas educativas y útiles
+- Sé conciso (máximo 150 palabras por respuesta)
+- Eres un asistente académico, no un chatbot genérico`;
+
+    try {
+        const response = await fetch('https://api.anthropic.com/v1/messages', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+                model: 'claude-sonnet-4-20250514',
+                max_tokens: 1000,
+                system: systemPrompt,
+                messages: chatHistory.map(m => ({ role: m.role, content: m.content }))
+            })
+        });
+
+        const data = await response.json();
+        const reply = data.content?.[0]?.text || 'Lo siento, no pude procesar tu mensaje. Intenta de nuevo.';
+
+        hideTyping();
+        chatHistory.push({ role: 'assistant', content: reply });
+        renderMessages();
+        renderSuggestions();
+
+    } catch (err) {
+        hideTyping();
+        const fallback = getFallbackResponse(text);
+        chatHistory.push({ role: 'assistant', content: fallback });
+        renderMessages();
+    }
+
+    document.getElementById('chatSend').disabled = false;
+    document.getElementById('chatInput').focus();
+}
+
+function getFallbackResponse(text) {
+    const t = text.toLowerCase();
+    if (t.includes('trigger')) return '**Trigger (Disparador):** Es un objeto de base de datos que se ejecuta automáticamente cuando ocurre un evento (INSERT, UPDATE, DELETE) en una tabla. Se usa para validaciones, auditorías y automatizaciones.\n\n```sql\nCREATE TRIGGER tr_ejemplo\nON tabla AFTER INSERT\nAS BEGIN\n  -- lógica aquí\nEND```';
+    if (t.includes('procedimiento') || t.includes('stored')) return '**Procedimiento Almacenado:** Es un conjunto de instrucciones SQL precompiladas guardadas en el servidor. Mejoran el rendimiento y la seguridad.\n\n```sql\nCREATE PROCEDURE sp_ejemplo\nAS BEGIN\n  SELECT * FROM tabla\nEND```';
+    if (t.includes('normalización') || t.includes('normalizacion')) return '**Normalización:** Proceso de organizar tablas para reducir redundancia. Las formas normales principales son:\n\n• **1FN**: Sin grupos repetitivos\n• **2FN**: Dependencia completa de la clave primaria\n• **3FN**: Sin dependencias transitivas';
+    if (t.includes('semana') || t.includes('trabajo')) {
+        const semanas = Object.keys(allData);
+        return `**Trabajos en el repositorio:**\n\n${semanas.map(s => `📚 **${s}**: ${Object.values(allData[s].tareas || {}).map(t => t.titulo).join(', ')}`).join('\n')}`;
+    }
+    return '¡Buena pregunta! Puedo ayudarte con conceptos de Base de Datos II como SQL, triggers, procedimientos almacenados, normalización, y más. También puedo darte información sobre los trabajos del repositorio. ¿Qué necesitas saber?';
+}
+
+/* ═══════════════════════════════════════════
+   INIT
+═══════════════════════════════════════════ */
+loadData();
+</script>
 </body>
 </html>
