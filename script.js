@@ -8,8 +8,26 @@ const STORAGE_BUCKET = "trabajos";
 // ============================================================
 // 🔐  CREDENCIALES ADMIN
 // ============================================================
-const ADMIN_USER = "phol";
-const ADMIN_PASS = "1234";
+// Estas son tus credenciales de acceso
+const ADMIN_USER = "admin"; 
+const ADMIN_PASS = "admin"; 
+
+function verificarLogin() {
+    // Agregamos .trim() a ambos campos para evitar errores por espacios vacíos[cite: 2]
+    const user = document.getElementById("inputUser")?.value.trim();
+    const pass = document.getElementById("inputPass")?.value.trim();
+    const errEl = document.getElementById("loginError");
+
+    if (user === ADMIN_USER && pass === ADMIN_PASS) {
+        adminLogueado = true;
+        mostrarPanel("panelControl");
+        cargarListaAdmin();
+        if (typeof showToast === 'function') showToast("✅ Acceso concedido", "success");
+    } else {
+        if (errEl) errEl.textContent = "❌ Usuario o contraseña incorrectos";
+        setTimeout(() => { if (errEl) errEl.textContent = ""; }, 3000);
+    }
+}
 
 // ============================================================
 // 📋  TEMAS POR SEMANA
