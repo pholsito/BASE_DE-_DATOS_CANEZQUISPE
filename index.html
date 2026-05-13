@@ -4,40 +4,41 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Phol Antoni | Base de Datos II — UPLA</title>
-    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800;900&family=JetBrains+Mono:wght@400;500;700&family=Bebas+Neue&family=Exo+2:ital,wght@0,900;1,900&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&family=Orbitron:wght@400;500;700;900&family=Rajdhani:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
     <style>
         /* ═══════════════════════════════════════════
            VARIABLES & RESET
         ═══════════════════════════════════════════ */
         :root {
-            --bg: #050810;
-            --bg2: #080d1a;
-            --surface: #0d1428;
-            --surface2: #111c35;
-            --border: rgba(0, 212, 255, 0.12);
-            --border2: rgba(0, 212, 255, 0.25);
-            --cyan: #00d4ff;
-            --cyan2: #00f5c4;
-            --gold: #f0c040;
-            --text: #e8f0fe;
-            --text2: #8a9bc4;
-            --text3: #4a5a80;
-            --font: 'Outfit', sans-serif;
+            --bg: #030609;
+            --bg2: #060b10;
+            --surface: rgba(6,14,26,0.9);
+            --surface2: rgba(10,20,38,0.95);
+            --border: rgba(0, 255, 180, 0.12);
+            --border2: rgba(0, 255, 180, 0.3);
+            --cyan: #00ffb4;
+            --cyan2: #00d4ff;
+            --purple: #b060ff;
+            --gold: #ffd700;
+            --red: #ff4444;
+            --text: #e8fff5;
+            --text2: #7ab8a0;
+            --text3: #3a6050;
+            --font-game: 'Press Start 2P', monospace;
+            --font-orb: 'Orbitron', sans-serif;
+            --font-body: 'Rajdhani', sans-serif;
             --mono: 'JetBrains Mono', monospace;
-            --display: 'Bebas Neue', cursive;
-            --serif: 'Exo 2', sans-serif;
-            --radius: 16px;
-            --radius-sm: 10px;
-            --glow: 0 0 30px rgba(0, 212, 255, 0.2);
-            --glow2: 0 0 60px rgba(0, 212, 255, 0.1);
+            --radius: 4px;
+            --glow: 0 0 20px rgba(0,255,180,0.3);
+            --glow2: 0 0 40px rgba(0,255,180,0.15);
+            --glow-purple: 0 0 20px rgba(176,96,255,0.4);
         }
 
         *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
-
         html { scroll-behavior: smooth; }
 
         body {
-            font-family: var(--font);
+            font-family: var(--font-body);
             background: var(--bg);
             color: var(--text);
             overflow-x: hidden;
@@ -45,14 +46,53 @@
         }
 
         /* ═══════════════════════════════════════════
-           CANVAS BG + PARTICLES
+           UNIVERSIDAD BG FIJO EN TODO EL SITIO
+        ═══════════════════════════════════════════ */
+        .site-bg {
+            position: fixed;
+            inset: 0;
+            z-index: 0;
+            pointer-events: none;
+        }
+
+        .site-bg-img {
+            width: 100%; height: 100%;
+            object-fit: cover;
+            filter: brightness(0.08) saturate(0.6) hue-rotate(150deg);
+        }
+
+        .site-bg-overlay {
+            position: absolute;
+            inset: 0;
+            background: 
+                radial-gradient(ellipse 80% 60% at 50% 0%, rgba(0,255,180,0.04) 0%, transparent 60%),
+                linear-gradient(180deg, rgba(3,6,9,0.7) 0%, rgba(3,6,9,0.4) 40%, rgba(3,6,9,0.7) 100%);
+        }
+
+        /* Scanlines effect */
+        .site-bg::after {
+            content: '';
+            position: absolute;
+            inset: 0;
+            background: repeating-linear-gradient(
+                0deg,
+                transparent,
+                transparent 2px,
+                rgba(0,0,0,0.08) 2px,
+                rgba(0,0,0,0.08) 4px
+            );
+            pointer-events: none;
+        }
+
+        /* ═══════════════════════════════════════════
+           CANVAS PARTÍCULAS
         ═══════════════════════════════════════════ */
         #bgCanvas {
             position: fixed;
             inset: 0;
             z-index: 0;
             pointer-events: none;
-            opacity: 0.5;
+            opacity: 0.6;
         }
 
         /* ═══════════════════════════════════════════
@@ -67,16 +107,22 @@
             justify-content: space-between;
             padding: 0 2.5rem;
             height: 70px;
-            background: rgba(5, 8, 16, 0.85);
+            background: rgba(3,6,9,0.92);
             backdrop-filter: blur(20px);
             border-bottom: 1px solid var(--border);
-            transition: all 0.3s ease;
+            box-shadow: 0 0 30px rgba(0,255,180,0.05);
         }
 
-        .navbar.scrolled {
-            height: 60px;
-            box-shadow: 0 4px 30px rgba(0, 0, 0, 0.5);
+        /* pixel corner decorations on navbar */
+        .navbar::before, .navbar::after {
+            content: '';
+            position: absolute;
+            bottom: -2px;
+            width: 60px; height: 2px;
+            background: var(--cyan);
         }
+        .navbar::before { left: 0; }
+        .navbar::after { right: 0; }
 
         .logo {
             display: flex;
@@ -87,13 +133,13 @@
 
         .logo-icon {
             width: 38px; height: 38px;
-            border-radius: 10px;
-            border: 1px solid var(--border2);
+            border: 2px solid var(--border2);
             overflow: hidden;
             display: flex;
             align-items: center;
             justify-content: center;
             background: var(--surface);
+            clip-path: polygon(8px 0%, 100% 0%, 100% calc(100% - 8px), calc(100% - 8px) 100%, 0% 100%, 0% 8px);
         }
 
         .logo-icon img { width: 100%; height: 100%; object-fit: contain; }
@@ -101,18 +147,19 @@
         .logo-text { display: flex; flex-direction: column; line-height: 1.1; }
 
         .logo-main {
-            font-family: var(--font);
+            font-family: var(--font-orb);
             font-weight: 700;
-            font-size: 0.95rem;
-            color: var(--text);
-            letter-spacing: 0.02em;
+            font-size: 0.8rem;
+            color: var(--cyan);
+            letter-spacing: 0.1em;
+            text-shadow: 0 0 10px rgba(0,255,180,0.5);
         }
 
         .logo-sub {
             font-family: var(--mono);
-            font-size: 0.65rem;
-            color: var(--cyan);
-            letter-spacing: 0.1em;
+            font-size: 0.6rem;
+            color: var(--text2);
+            letter-spacing: 0.12em;
         }
 
         .nav-links {
@@ -122,44 +169,49 @@
         }
 
         .nav-link {
-            font-family: var(--font);
+            font-family: var(--font-orb);
             font-weight: 500;
-            font-size: 0.875rem;
+            font-size: 0.7rem;
             color: var(--text2);
             text-decoration: none;
             padding: 0.45rem 1rem;
-            border-radius: 8px;
+            border: 1px solid transparent;
+            letter-spacing: 0.1em;
             transition: all 0.2s;
-            letter-spacing: 0.02em;
+            text-transform: uppercase;
+            clip-path: polygon(6px 0%, 100% 0%, calc(100% - 6px) 100%, 0% 100%);
         }
 
         .nav-link:hover {
             color: var(--cyan);
-            background: rgba(0, 212, 255, 0.07);
+            border-color: var(--border2);
+            background: rgba(0,255,180,0.06);
+            text-shadow: 0 0 8px rgba(0,255,180,0.5);
         }
 
         .btn-admin {
             display: flex;
             align-items: center;
             gap: 6px;
-            font-family: var(--font);
-            font-weight: 600;
-            font-size: 0.8rem;
+            font-family: var(--font-orb);
+            font-weight: 700;
+            font-size: 0.65rem;
             color: var(--bg);
             background: var(--cyan);
             border: none;
-            border-radius: 8px;
-            padding: 0.45rem 1.1rem;
+            padding: 0.5rem 1.2rem;
             cursor: pointer;
             transition: all 0.2s;
-            letter-spacing: 0.04em;
+            letter-spacing: 0.08em;
             text-transform: uppercase;
+            clip-path: polygon(8px 0%, 100% 0%, calc(100% - 8px) 100%, 0% 100%);
+            box-shadow: var(--glow);
         }
 
         .btn-admin:hover {
             background: var(--cyan2);
+            box-shadow: 0 0 30px rgba(0,212,255,0.5);
             transform: translateY(-1px);
-            box-shadow: 0 4px 20px rgba(0, 212, 255, 0.4);
         }
 
         /* hamburger */
@@ -175,10 +227,9 @@
 
         .hamburger span {
             display: block;
-            width: 24px;
-            height: 2px;
-            background: var(--text);
-            border-radius: 2px;
+            width: 24px; height: 2px;
+            background: var(--cyan);
+            border-radius: 0;
             transition: all 0.3s;
         }
 
@@ -187,7 +238,7 @@
             display: none;
             position: fixed;
             top: 70px; left: 0; right: 0;
-            background: rgba(8, 13, 26, 0.98);
+            background: rgba(3,6,9,0.98);
             backdrop-filter: blur(20px);
             border-bottom: 1px solid var(--border);
             z-index: 99;
@@ -199,23 +250,24 @@
         .mobile-menu.open { display: flex; }
 
         .mobile-menu a, .mobile-menu button {
-            font-family: var(--font);
-            font-size: 1rem;
+            font-family: var(--font-orb);
+            font-size: 0.75rem;
             font-weight: 500;
             color: var(--text);
             text-decoration: none;
             padding: 0.75rem 1rem;
-            border-radius: 10px;
             border: none;
             background: none;
             cursor: pointer;
             text-align: left;
             transition: all 0.2s;
+            letter-spacing: 0.1em;
+            text-transform: uppercase;
         }
 
         .mobile-menu a:hover, .mobile-menu button:hover {
-            background: var(--surface);
             color: var(--cyan);
+            background: rgba(0,255,180,0.05);
         }
 
         /* ═══════════════════════════════════════════
@@ -227,35 +279,54 @@
             display: flex;
             align-items: center;
             overflow: hidden;
+            z-index: 1;
         }
 
-        .hero-bg {
+        /* UPLA visible en hero también */
+        .hero-upla-bg {
             position: absolute;
             inset: 0;
             z-index: 1;
         }
 
-        .hero-bg img {
+        .hero-upla-bg img {
             width: 100%; height: 100%;
             object-fit: cover;
-            filter: brightness(0.18) saturate(0.5);
+            filter: brightness(0.13) saturate(0.5) hue-rotate(160deg);
         }
 
         .hero-overlay {
             position: absolute;
             inset: 0;
-            background: linear-gradient(135deg, rgba(5,8,16,0.92) 0%, rgba(0,80,120,0.3) 50%, rgba(5,8,16,0.95) 100%);
+            background: linear-gradient(
+                135deg,
+                rgba(3,6,9,0.88) 0%,
+                rgba(0,40,60,0.4) 50%,
+                rgba(3,6,9,0.92) 100%
+            );
         }
 
+        /* pixel grid */
         .hero-grid {
             position: absolute;
             inset: 0;
             background-image:
-                linear-gradient(rgba(0,212,255,0.04) 1px, transparent 1px),
-                linear-gradient(90deg, rgba(0,212,255,0.04) 1px, transparent 1px);
-            background-size: 60px 60px;
-            mask-image: radial-gradient(ellipse 80% 80% at 50% 50%, black 30%, transparent 100%);
+                linear-gradient(rgba(0,255,180,0.035) 1px, transparent 1px),
+                linear-gradient(90deg, rgba(0,255,180,0.035) 1px, transparent 1px);
+            background-size: 40px 40px;
         }
+
+        /* corner brackets */
+        .hero-corner {
+            position: absolute;
+            width: 60px; height: 60px;
+            z-index: 3;
+            pointer-events: none;
+        }
+        .hero-corner.tl { top: 90px; left: 20px; border-top: 2px solid var(--cyan); border-left: 2px solid var(--cyan); }
+        .hero-corner.tr { top: 90px; right: 20px; border-top: 2px solid var(--cyan); border-right: 2px solid var(--cyan); }
+        .hero-corner.bl { bottom: 20px; left: 20px; border-bottom: 2px solid var(--cyan); border-left: 2px solid var(--cyan); }
+        .hero-corner.br { bottom: 20px; right: 20px; border-bottom: 2px solid var(--cyan); border-right: 2px solid var(--cyan); }
 
         .hero-content {
             position: relative;
@@ -271,73 +342,76 @@
             align-items: center;
             gap: 8px;
             font-family: var(--mono);
-            font-size: 0.72rem;
+            font-size: 0.65rem;
             color: var(--cyan);
-            background: rgba(0, 212, 255, 0.08);
-            border: 1px solid rgba(0, 212, 255, 0.2);
-            border-radius: 100px;
+            background: rgba(0, 255, 180, 0.07);
+            border: 1px solid rgba(0, 255, 180, 0.25);
             padding: 0.45rem 1.2rem;
-            letter-spacing: 0.08em;
+            letter-spacing: 0.1em;
             text-transform: uppercase;
             margin-bottom: 2rem;
             animation: fadeInDown 0.8s ease both;
+            clip-path: polygon(10px 0%, 100% 0%, calc(100% - 10px) 100%, 0% 100%);
         }
 
         .hero-badge::before {
             content: '';
             width: 6px; height: 6px;
-            border-radius: 50%;
             background: var(--cyan);
-            animation: pulse 2s infinite;
+            animation: blink 1s step-end infinite;
         }
 
-        @keyframes pulse {
-            0%, 100% { opacity: 1; transform: scale(1); }
-            50% { opacity: 0.4; transform: scale(0.7); }
-        }
+        @keyframes blink { 0%, 100% { opacity: 1; } 50% { opacity: 0; } }
 
         .hero-title {
-            font-family: var(--display);
-            font-size: clamp(5rem, 16vw, 13rem);
+            font-family: var(--font-game);
+            font-size: clamp(2.5rem, 8vw, 6rem);
             font-weight: 400;
-            line-height: 0.88;
-            letter-spacing: 0.06em;
-            margin-bottom: 1.2rem;
+            line-height: 1.1;
+            letter-spacing: 0.05em;
+            margin-bottom: 1.5rem;
             animation: fadeInUp 0.9s ease 0.1s both;
         }
 
         .title-line {
             display: block;
             color: var(--text);
-            text-shadow: 0 0 80px rgba(0,212,255,0.15);
+            text-shadow: 0 0 30px rgba(0,255,180,0.15), 3px 3px 0px rgba(0,0,0,0.8);
         }
 
         .title-line.accent {
-            background: linear-gradient(135deg, var(--cyan) 0%, var(--cyan2) 60%, #a78bfa 100%);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-            background-clip: text;
-            filter: drop-shadow(0 0 30px rgba(0,212,255,0.4));
+            color: var(--cyan);
+            text-shadow: 0 0 20px rgba(0,255,180,0.6), 3px 3px 0px rgba(0,100,70,0.5);
+            animation: glitch 4s infinite;
+        }
+
+        @keyframes glitch {
+            0%, 90%, 100% { clip-path: none; transform: none; }
+            92% { clip-path: inset(20% 0 30% 0); transform: translate(-3px, 0); }
+            94% { clip-path: inset(50% 0 10% 0); transform: translate(3px, 0); }
+            96% { clip-path: inset(10% 0 60% 0); transform: translate(-2px, 0); }
+            98% { clip-path: none; transform: none; }
         }
 
         .hero-sub {
-            font-family: var(--serif);
-            font-style: italic;
-            font-weight: 900;
-            font-size: 1rem;
+            font-family: var(--font-orb);
+            font-size: 0.75rem;
             color: var(--text2);
             margin-bottom: 2rem;
-            letter-spacing: 0.15em;
+            letter-spacing: 0.2em;
             text-transform: uppercase;
             animation: fadeInUp 0.9s ease 0.2s both;
         }
 
+        .hero-sub span { color: var(--purple); }
+
         .hero-desc {
-            font-size: 1.05rem;
+            font-family: var(--font-body);
+            font-size: 1.1rem;
             color: var(--text2);
-            max-width: 560px;
+            max-width: 520px;
             margin: 0 auto 2.5rem;
-            font-weight: 300;
+            font-weight: 400;
             line-height: 1.75;
             animation: fadeInUp 0.9s ease 0.3s both;
         }
@@ -355,46 +429,49 @@
             display: inline-flex;
             align-items: center;
             gap: 8px;
-            font-family: var(--font);
-            font-weight: 600;
-            font-size: 0.9rem;
+            font-family: var(--font-orb);
+            font-weight: 700;
+            font-size: 0.7rem;
             color: var(--bg);
-            background: linear-gradient(135deg, var(--cyan), var(--cyan2));
+            background: var(--cyan);
             border: none;
-            border-radius: 12px;
-            padding: 0.85rem 2rem;
+            padding: 0.9rem 2rem;
             text-decoration: none;
             cursor: pointer;
             transition: all 0.25s;
-            letter-spacing: 0.02em;
+            letter-spacing: 0.1em;
+            text-transform: uppercase;
+            clip-path: polygon(10px 0%, 100% 0%, calc(100% - 10px) 100%, 0% 100%);
+            box-shadow: var(--glow);
         }
 
         .btn-primary:hover {
             transform: translateY(-2px);
-            box-shadow: 0 8px 30px rgba(0, 212, 255, 0.4);
+            box-shadow: 0 8px 30px rgba(0,255,180,0.5);
         }
 
         .btn-ghost {
             display: inline-flex;
             align-items: center;
             gap: 8px;
-            font-family: var(--font);
+            font-family: var(--font-orb);
             font-weight: 500;
-            font-size: 0.9rem;
-            color: var(--text);
-            background: rgba(255,255,255,0.05);
+            font-size: 0.7rem;
+            color: var(--cyan);
+            background: transparent;
             border: 1px solid var(--border2);
-            border-radius: 12px;
-            padding: 0.85rem 2rem;
+            padding: 0.9rem 2rem;
             text-decoration: none;
             cursor: pointer;
             transition: all 0.25s;
+            letter-spacing: 0.1em;
+            text-transform: uppercase;
+            clip-path: polygon(10px 0%, 100% 0%, calc(100% - 10px) 100%, 0% 100%);
         }
 
         .btn-ghost:hover {
-            background: rgba(0, 212, 255, 0.08);
-            border-color: var(--cyan);
-            color: var(--cyan);
+            background: rgba(0,255,180,0.08);
+            box-shadow: var(--glow);
             transform: translateY(-2px);
         }
 
@@ -405,27 +482,22 @@
             animation: fadeInUp 0.9s ease 0.5s both;
         }
 
-        .stat {
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            gap: 4px;
-        }
+        .stat { display: flex; flex-direction: column; align-items: center; gap: 6px; }
 
         .stat span {
-            font-family: var(--font);
-            font-size: 2rem;
-            font-weight: 800;
+            font-family: var(--font-game);
+            font-size: 1.8rem;
             color: var(--cyan);
+            text-shadow: 0 0 15px rgba(0,255,180,0.5);
             line-height: 1;
         }
 
         .stat small {
             font-family: var(--mono);
-            font-size: 0.65rem;
+            font-size: 0.6rem;
             color: var(--text3);
             text-transform: uppercase;
-            letter-spacing: 0.1em;
+            letter-spacing: 0.12em;
         }
 
         @keyframes fadeInDown {
@@ -439,13 +511,15 @@
         }
 
         /* ═══════════════════════════════════════════
-           SECTIONS COMMON
+           SECTIONS
         ═══════════════════════════════════════════ */
         .container {
             max-width: 1100px;
             margin: 0 auto;
             padding: 0 2rem;
         }
+
+        section { position: relative; z-index: 1; }
 
         .section-header {
             text-align: center;
@@ -455,98 +529,113 @@
         .section-tag {
             display: inline-block;
             font-family: var(--mono);
-            font-size: 0.72rem;
+            font-size: 0.65rem;
             color: var(--cyan);
-            letter-spacing: 0.15em;
+            letter-spacing: 0.2em;
             text-transform: uppercase;
             margin-bottom: 0.75rem;
             opacity: 0.8;
         }
 
         .section-header h2 {
-            font-family: var(--font);
-            font-size: clamp(2rem, 5vw, 3rem);
-            font-weight: 800;
+            font-family: var(--font-orb);
+            font-size: clamp(1.5rem, 4vw, 2.5rem);
+            font-weight: 900;
             color: var(--text);
-            letter-spacing: -0.02em;
+            letter-spacing: 0.08em;
+            text-transform: uppercase;
+            text-shadow: 0 0 20px rgba(0,255,180,0.15);
         }
 
         .section-header p {
+            font-family: var(--font-body);
             color: var(--text2);
             font-size: 1rem;
             margin-top: 0.5rem;
-            font-weight: 300;
+            font-weight: 400;
+        }
+
+        /* decorative line */
+        .section-line {
+            display: block;
+            width: 60px; height: 2px;
+            background: linear-gradient(90deg, var(--cyan), var(--purple));
+            margin: 1rem auto 0;
+            box-shadow: 0 0 10px rgba(0,255,180,0.4);
         }
 
         /* ═══════════════════════════════════════════
            SOBRE MÍ
         ═══════════════════════════════════════════ */
-        .sobre {
-            position: relative;
-            z-index: 1;
-            padding: 6rem 0;
-        }
+        .sobre { padding: 6rem 0; }
 
         .sobre-card {
             display: grid;
-            grid-template-columns: 300px 1fr;
+            grid-template-columns: 280px 1fr;
             gap: 4rem;
             align-items: start;
             background: var(--surface);
             border: 1px solid var(--border);
-            border-radius: 24px;
             padding: 3rem;
             position: relative;
             overflow: hidden;
+            clip-path: polygon(16px 0%, 100% 0%, 100% calc(100% - 16px), calc(100% - 16px) 100%, 0% 100%, 0% 16px);
         }
 
+        /* corner accent */
         .sobre-card::before {
             content: '';
             position: absolute;
-            top: -100px; right: -100px;
-            width: 300px; height: 300px;
-            background: radial-gradient(circle, rgba(0,212,255,0.08), transparent 70%);
-            pointer-events: none;
+            top: 0; left: 0;
+            border-left: 40px solid var(--cyan);
+            border-bottom: 40px solid transparent;
+            opacity: 0.15;
         }
 
         .foto-wrap {
-            position: relative;
             display: flex;
-            justify-content: center;
+            flex-direction: column;
+            align-items: center;
+            gap: 1rem;
+            position: relative;
+            z-index: 1;
         }
 
         .foto-frame {
             width: 220px; height: 280px;
-            border-radius: 20px;
             overflow: hidden;
             border: 2px solid var(--border2);
             position: relative;
-            z-index: 1;
+            clip-path: polygon(12px 0%, 100% 0%, 100% calc(100% - 12px), calc(100% - 12px) 100%, 0% 100%, 0% 12px);
+            box-shadow: var(--glow);
         }
 
         .foto-frame img {
             width: 100%; height: 100%;
             object-fit: cover;
             object-position: center top;
+            filter: brightness(0.9) saturate(0.8);
         }
 
         .foto-glow {
             position: absolute;
             bottom: -20px; left: 50%;
             transform: translateX(-50%);
-            width: 180px; height: 40px;
+            width: 160px; height: 30px;
             background: var(--cyan);
-            filter: blur(40px);
-            opacity: 0.25;
+            filter: blur(30px);
+            opacity: 0.2;
         }
 
         .sobre-info h3 {
-            font-family: var(--font);
-            font-size: 1.75rem;
-            font-weight: 800;
-            color: var(--text);
+            font-family: var(--font-orb);
+            font-size: 1.4rem;
+            font-weight: 900;
+            color: var(--cyan);
             margin-bottom: 1rem;
-            letter-spacing: -0.02em;
+            letter-spacing: 0.06em;
+            text-transform: uppercase;
+            text-shadow: 0 0 15px rgba(0,255,180,0.3);
         }
 
         .info-chips {
@@ -561,21 +650,22 @@
             align-items: center;
             gap: 5px;
             font-family: var(--mono);
-            font-size: 0.72rem;
+            font-size: 0.65rem;
             color: var(--cyan);
-            background: rgba(0, 212, 255, 0.08);
-            border: 1px solid rgba(0, 212, 255, 0.18);
-            border-radius: 100px;
+            background: rgba(0, 255, 180, 0.07);
+            border: 1px solid rgba(0, 255, 180, 0.2);
             padding: 0.3rem 0.9rem;
-            letter-spacing: 0.04em;
+            letter-spacing: 0.06em;
+            clip-path: polygon(6px 0%, 100% 0%, calc(100% - 6px) 100%, 0% 100%);
         }
 
         .sobre-info > p {
+            font-family: var(--font-body);
             color: var(--text2);
-            font-size: 0.95rem;
+            font-size: 1rem;
             line-height: 1.75;
             margin-bottom: 2rem;
-            font-weight: 300;
+            font-weight: 400;
         }
 
         .skills-grid { display: flex; flex-direction: column; gap: 1rem; }
@@ -583,27 +673,27 @@
         .skill-item span {
             display: block;
             font-family: var(--mono);
-            font-size: 0.72rem;
+            font-size: 0.65rem;
             color: var(--text2);
-            letter-spacing: 0.08em;
+            letter-spacing: 0.1em;
             margin-bottom: 6px;
             text-transform: uppercase;
         }
 
         .skill-bar {
             height: 4px;
-            background: rgba(255,255,255,0.06);
-            border-radius: 100px;
+            background: rgba(255,255,255,0.04);
             overflow: hidden;
+            position: relative;
         }
 
         .skill-bar div {
             height: 100%;
-            background: linear-gradient(90deg, var(--cyan), var(--cyan2));
-            border-radius: 100px;
+            background: linear-gradient(90deg, var(--cyan), var(--purple));
             transform: scaleX(0);
             transform-origin: left;
             transition: transform 1.2s cubic-bezier(0.4, 0, 0.2, 1);
+            box-shadow: 0 0 10px rgba(0,255,180,0.4);
         }
 
         .skill-bar div.animated { transform: scaleX(1); }
@@ -611,11 +701,7 @@
         /* ═══════════════════════════════════════════
            SEMANAS
         ═══════════════════════════════════════════ */
-        .semanas {
-            position: relative;
-            z-index: 1;
-            padding: 4rem 0 6rem;
-        }
+        .semanas { padding: 4rem 0 6rem; }
 
         .filtros {
             display: flex;
@@ -627,23 +713,24 @@
 
         .filtro-btn {
             font-family: var(--mono);
-            font-size: 0.72rem;
+            font-size: 0.6rem;
             font-weight: 500;
             color: var(--text2);
-            background: var(--surface);
+            background: rgba(6,14,26,0.8);
             border: 1px solid var(--border);
-            border-radius: 100px;
             padding: 0.4rem 1rem;
             cursor: pointer;
-            letter-spacing: 0.08em;
+            letter-spacing: 0.1em;
             transition: all 0.2s;
             text-transform: uppercase;
+            clip-path: polygon(6px 0%, 100% 0%, calc(100% - 6px) 100%, 0% 100%);
         }
 
         .filtro-btn:hover, .filtro-btn.active {
             color: var(--bg);
             background: var(--cyan);
             border-color: var(--cyan);
+            box-shadow: var(--glow);
         }
 
         .semanas-grid {
@@ -655,13 +742,12 @@
         .semana-card {
             background: var(--surface);
             border: 1px solid var(--border);
-            border-radius: var(--radius);
             padding: 1.75rem;
             transition: all 0.3s ease;
-            cursor: default;
             position: relative;
             overflow: hidden;
             animation: fadeInUp 0.6s ease both;
+            clip-path: polygon(12px 0%, 100% 0%, 100% calc(100% - 12px), calc(100% - 12px) 100%, 0% 100%, 0% 12px);
         }
 
         .semana-card::before {
@@ -669,7 +755,7 @@
             position: absolute;
             top: 0; left: 0; right: 0;
             height: 2px;
-            background: linear-gradient(90deg, var(--cyan), var(--cyan2));
+            background: linear-gradient(90deg, var(--cyan), var(--purple));
             transform: scaleX(0);
             transform-origin: left;
             transition: transform 0.3s ease;
@@ -678,10 +764,23 @@
         .semana-card:hover {
             border-color: var(--border2);
             transform: translateY(-4px);
-            box-shadow: var(--glow);
+            box-shadow: var(--glow2);
         }
 
         .semana-card:hover::before { transform: scaleX(1); }
+
+        /* thumbnail image in card */
+        .card-thumb {
+            width: 100%;
+            height: 120px;
+            object-fit: cover;
+            margin-bottom: 1rem;
+            border: 1px solid var(--border);
+            filter: brightness(0.85) saturate(0.8);
+            display: none;
+        }
+
+        .card-thumb.visible { display: block; }
 
         .card-header {
             display: flex;
@@ -692,35 +791,37 @@
 
         .semana-num {
             font-family: var(--mono);
-            font-size: 0.65rem;
+            font-size: 0.6rem;
             color: var(--cyan);
-            background: rgba(0, 212, 255, 0.08);
-            border: 1px solid rgba(0, 212, 255, 0.18);
-            border-radius: 6px;
+            background: rgba(0, 255, 180, 0.07);
+            border: 1px solid rgba(0, 255, 180, 0.2);
             padding: 0.25rem 0.6rem;
-            letter-spacing: 0.1em;
+            letter-spacing: 0.12em;
             text-transform: uppercase;
         }
 
         .semana-count {
             font-family: var(--mono);
-            font-size: 0.65rem;
+            font-size: 0.6rem;
             color: var(--text3);
         }
 
         .card-title {
-            font-family: var(--font);
-            font-size: 1rem;
+            font-family: var(--font-orb);
+            font-size: 0.8rem;
             font-weight: 700;
             color: var(--text);
             margin-bottom: 0.5rem;
-            line-height: 1.35;
+            line-height: 1.4;
+            text-transform: uppercase;
+            letter-spacing: 0.04em;
         }
 
         .card-info {
-            font-size: 0.825rem;
+            font-family: var(--font-body);
+            font-size: 0.9rem;
             color: var(--text2);
-            font-weight: 300;
+            font-weight: 400;
             margin-bottom: 1.25rem;
             line-height: 1.5;
         }
@@ -731,38 +832,37 @@
             display: flex;
             align-items: center;
             gap: 10px;
-            font-family: var(--font);
-            font-size: 0.825rem;
+            font-family: var(--font-body);
+            font-size: 0.9rem;
             font-weight: 500;
             color: var(--text2);
             text-decoration: none;
-            background: rgba(255,255,255,0.025);
-            border: 1px solid rgba(255,255,255,0.06);
-            border-radius: 10px;
+            background: rgba(0,255,180,0.02);
+            border: 1px solid rgba(255,255,255,0.05);
             padding: 0.65rem 0.9rem;
             transition: all 0.2s;
         }
 
         .tarea-link:hover {
             color: var(--cyan);
-            background: rgba(0, 212, 255, 0.06);
-            border-color: rgba(0, 212, 255, 0.2);
+            background: rgba(0,255,180,0.05);
+            border-color: rgba(0,255,180,0.2);
             transform: translateX(4px);
+            box-shadow: inset 3px 0 0 var(--cyan);
         }
 
         .tarea-link .tarea-icon {
-            width: 26px; height: 26px;
-            border-radius: 7px;
-            background: rgba(0, 212, 255, 0.1);
+            width: 24px; height: 24px;
             display: flex;
             align-items: center;
             justify-content: center;
             font-size: 0.75rem;
             flex-shrink: 0;
+            color: var(--cyan);
         }
 
         .tarea-link.disabled {
-            opacity: 0.4;
+            opacity: 0.35;
             pointer-events: none;
         }
 
@@ -780,7 +880,7 @@
             width: 36px; height: 36px;
             border: 2px solid var(--border);
             border-top-color: var(--cyan);
-            border-radius: 50%;
+            border-radius: 0;
             animation: spin 0.8s linear infinite;
         }
 
@@ -798,110 +898,85 @@
 
         .chat-toggle {
             width: 60px; height: 60px;
-            border-radius: 50%;
-            background: linear-gradient(135deg, var(--cyan), var(--cyan2));
+            background: linear-gradient(135deg, var(--cyan), var(--purple));
             border: none;
             cursor: pointer;
+            font-size: 1.5rem;
             display: flex;
             align-items: center;
             justify-content: center;
-            font-size: 1.5rem;
-            box-shadow: 0 4px 25px rgba(0, 212, 255, 0.4);
-            transition: all 0.3s;
             position: relative;
+            clip-path: polygon(10px 0%, 100% 0%, 100% calc(100% - 10px), calc(100% - 10px) 100%, 0% 100%, 0% 10px);
+            box-shadow: var(--glow), var(--glow-purple);
+            transition: all 0.3s;
         }
 
-        .chat-toggle:hover {
-            transform: scale(1.1);
-            box-shadow: 0 6px 35px rgba(0, 212, 255, 0.55);
-        }
+        .chat-toggle:hover { transform: scale(1.05); }
 
         .chat-ping {
             position: absolute;
-            top: 2px; right: 2px;
+            top: -3px; right: -3px;
             width: 12px; height: 12px;
-            border-radius: 50%;
-            background: var(--gold);
-            border: 2px solid var(--bg);
-            animation: pingAnim 1.5s ease infinite;
+            background: #ff4444;
+            animation: ping 1.5s infinite;
         }
 
-        @keyframes pingAnim {
+        @keyframes ping {
             0%, 100% { transform: scale(1); opacity: 1; }
-            50% { transform: scale(1.3); opacity: 0.7; }
+            50% { transform: scale(1.4); opacity: 0.5; }
         }
 
         .chat-window {
-            position: fixed;
-            bottom: 5.5rem;
-            right: 2rem;
-            z-index: 200;
-            width: 380px;
-            max-height: 540px;
-            background: var(--bg2);
+            position: absolute;
+            bottom: 75px; right: 0;
+            width: 360px;
+            height: 480px;
+            background: rgba(3,6,9,0.97);
             border: 1px solid var(--border2);
-            border-radius: 20px;
-            box-shadow: 0 20px 60px rgba(0,0,0,0.6), 0 0 40px rgba(0,212,255,0.1);
-            display: flex;
+            display: none;
             flex-direction: column;
             overflow: hidden;
-            transform: scale(0.85) translateY(20px);
-            opacity: 0;
-            pointer-events: none;
-            transition: all 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
-            transform-origin: bottom right;
+            box-shadow: var(--glow2);
+            clip-path: polygon(12px 0%, 100% 0%, 100% calc(100% - 12px), calc(100% - 12px) 100%, 0% 100%, 0% 12px);
         }
 
-        .chat-window.open {
-            transform: scale(1) translateY(0);
-            opacity: 1;
-            pointer-events: all;
-        }
+        .chat-window.open { display: flex; }
 
         .chat-header {
             display: flex;
             align-items: center;
             gap: 12px;
-            padding: 1rem 1.25rem;
-            background: var(--surface);
+            padding: 1rem;
+            background: rgba(0,255,180,0.05);
             border-bottom: 1px solid var(--border);
         }
 
         .chat-avatar {
             width: 36px; height: 36px;
-            border-radius: 50%;
-            background: linear-gradient(135deg, var(--cyan), var(--cyan2));
+            background: linear-gradient(135deg, var(--cyan), var(--purple));
             display: flex;
             align-items: center;
             justify-content: center;
-            font-size: 1rem;
+            font-size: 1.1rem;
             flex-shrink: 0;
+            clip-path: polygon(6px 0%, 100% 0%, calc(100% - 6px) 100%, 0% 100%);
         }
 
         .chat-header-info { flex: 1; }
 
         .chat-header-name {
-            font-family: var(--font);
+            font-family: var(--font-orb);
             font-weight: 700;
-            font-size: 0.875rem;
-            color: var(--text);
+            font-size: 0.7rem;
+            color: var(--cyan);
+            letter-spacing: 0.08em;
+            text-transform: uppercase;
         }
 
         .chat-header-status {
             font-family: var(--mono);
-            font-size: 0.65rem;
-            color: var(--cyan2);
-            letter-spacing: 0.05em;
-            display: flex;
-            align-items: center;
-            gap: 5px;
-        }
-
-        .chat-header-status::before {
-            content: '';
-            width: 5px; height: 5px;
-            border-radius: 50%;
-            background: var(--cyan2);
+            font-size: 0.6rem;
+            color: var(--text3);
         }
 
         .chat-close {
@@ -909,142 +984,96 @@
             border: none;
             color: var(--text3);
             cursor: pointer;
-            font-size: 1.1rem;
+            font-size: 1rem;
             padding: 4px;
-            border-radius: 6px;
-            transition: all 0.2s;
-            line-height: 1;
+            transition: color 0.2s;
         }
 
-        .chat-close:hover { color: var(--text); background: rgba(255,255,255,0.06); }
+        .chat-close:hover { color: var(--cyan); }
 
         .chat-messages {
             flex: 1;
             overflow-y: auto;
-            padding: 1.25rem;
+            padding: 1rem;
             display: flex;
             flex-direction: column;
-            gap: 1rem;
+            gap: 0.75rem;
             scrollbar-width: thin;
             scrollbar-color: var(--border) transparent;
         }
 
-        .chat-messages::-webkit-scrollbar { width: 4px; }
-        .chat-messages::-webkit-scrollbar-thumb { background: var(--border); border-radius: 4px; }
-
-        .msg {
-            max-width: 85%;
-            animation: msgFade 0.3s ease;
-        }
-
-        @keyframes msgFade {
-            from { opacity: 0; transform: translateY(8px); }
-            to { opacity: 1; transform: translateY(0); }
-        }
-
+        .msg { display: flex; flex-direction: column; max-width: 85%; }
         .msg.bot { align-self: flex-start; }
         .msg.user { align-self: flex-end; }
 
         .msg-bubble {
-            padding: 0.75rem 1rem;
-            border-radius: 14px;
-            font-size: 0.84rem;
-            line-height: 1.55;
+            padding: 0.65rem 0.9rem;
+            font-family: var(--font-body);
+            font-size: 0.9rem;
+            line-height: 1.5;
         }
 
         .msg.bot .msg-bubble {
-            background: var(--surface2);
+            background: rgba(0,255,180,0.05);
             border: 1px solid var(--border);
             color: var(--text);
-            border-bottom-left-radius: 4px;
         }
 
         .msg.user .msg-bubble {
-            background: linear-gradient(135deg, rgba(0,212,255,0.2), rgba(0,245,196,0.15));
-            border: 1px solid rgba(0,212,255,0.25);
+            background: rgba(176,96,255,0.15);
+            border: 1px solid rgba(176,96,255,0.3);
             color: var(--text);
-            border-bottom-right-radius: 4px;
         }
 
         .msg-time {
             font-family: var(--mono);
-            font-size: 0.6rem;
+            font-size: 0.55rem;
             color: var(--text3);
-            margin-top: 4px;
-            padding: 0 4px;
+            margin-top: 3px;
         }
 
         .msg.user .msg-time { text-align: right; }
 
-        .typing-indicator {
-            display: flex;
-            gap: 4px;
-            align-items: center;
-            padding: 0.75rem 1rem;
-            background: var(--surface2);
-            border: 1px solid var(--border);
-            border-radius: 14px;
-            border-bottom-left-radius: 4px;
-            width: fit-content;
-        }
-
-        .typing-dot {
-            width: 6px; height: 6px;
-            border-radius: 50%;
-            background: var(--text3);
-            animation: typingDot 1.2s infinite ease;
-        }
-
-        .typing-dot:nth-child(2) { animation-delay: 0.2s; }
-        .typing-dot:nth-child(3) { animation-delay: 0.4s; }
-
-        @keyframes typingDot {
-            0%, 80%, 100% { transform: scale(0.7); opacity: 0.4; }
-            40% { transform: scale(1); opacity: 1; }
-        }
-
         .chat-suggestions {
+            padding: 0 0.75rem 0.5rem;
             display: flex;
             flex-wrap: wrap;
-            gap: 0.4rem;
-            padding: 0 1.25rem 0.75rem;
+            gap: 0.35rem;
         }
 
         .suggestion-btn {
-            font-family: var(--font);
-            font-size: 0.72rem;
+            font-family: var(--mono);
+            font-size: 0.6rem;
             color: var(--cyan);
-            background: rgba(0, 212, 255, 0.07);
-            border: 1px solid rgba(0, 212, 255, 0.18);
-            border-radius: 100px;
-            padding: 0.3rem 0.8rem;
+            background: rgba(0,255,180,0.06);
+            border: 1px solid var(--border);
+            padding: 0.3rem 0.6rem;
             cursor: pointer;
             transition: all 0.2s;
-            white-space: nowrap;
+            letter-spacing: 0.04em;
         }
 
         .suggestion-btn:hover {
-            background: rgba(0, 212, 255, 0.15);
-            border-color: var(--cyan);
+            background: rgba(0,255,180,0.12);
+            border-color: var(--border2);
         }
 
         .chat-input-area {
             display: flex;
-            gap: 8px;
-            padding: 1rem 1.25rem;
+            gap: 0.5rem;
+            padding: 0.75rem;
             border-top: 1px solid var(--border);
-            background: var(--surface);
+            background: rgba(0,255,180,0.02);
         }
 
         .chat-input {
             flex: 1;
-            font-family: var(--font);
-            font-size: 0.875rem;
+            font-family: var(--mono);
+            font-size: 0.8rem;
             color: var(--text);
-            background: var(--bg);
+            background: rgba(6,14,26,0.8);
             border: 1px solid var(--border);
-            border-radius: 10px;
-            padding: 0.65rem 1rem;
+            padding: 0.55rem 0.75rem;
             outline: none;
             transition: border-color 0.2s;
         }
@@ -1053,21 +1082,43 @@
         .chat-input::placeholder { color: var(--text3); }
 
         .chat-send {
-            width: 40px; height: 40px;
-            border-radius: 10px;
-            background: linear-gradient(135deg, var(--cyan), var(--cyan2));
+            font-family: var(--font-orb);
+            font-weight: 700;
+            font-size: 0.65rem;
+            color: var(--bg);
+            background: var(--cyan);
             border: none;
+            padding: 0.55rem 0.85rem;
             cursor: pointer;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 1rem;
             transition: all 0.2s;
-            flex-shrink: 0;
+            letter-spacing: 0.05em;
+            clip-path: polygon(6px 0%, 100% 0%, calc(100% - 6px) 100%, 0% 100%);
         }
 
-        .chat-send:hover { transform: scale(1.05); box-shadow: 0 4px 15px rgba(0,212,255,0.4); }
-        .chat-send:disabled { opacity: 0.5; cursor: not-allowed; transform: none; }
+        .chat-send:hover { background: var(--cyan2); }
+
+        .typing-indicator {
+            display: flex;
+            gap: 5px;
+            padding: 0.65rem 0.9rem;
+            background: rgba(0,255,180,0.05);
+            border: 1px solid var(--border);
+            width: fit-content;
+        }
+
+        .typing-dot {
+            width: 6px; height: 6px;
+            background: var(--cyan);
+            animation: typingBounce 1.2s infinite;
+        }
+
+        .typing-dot:nth-child(2) { animation-delay: 0.2s; }
+        .typing-dot:nth-child(3) { animation-delay: 0.4s; }
+
+        @keyframes typingBounce {
+            0%, 60%, 100% { transform: translateY(0); }
+            30% { transform: translateY(-6px); }
+        }
 
         /* ═══════════════════════════════════════════
            MODAL ADMIN
@@ -1075,51 +1126,65 @@
         .modal-overlay {
             position: fixed;
             inset: 0;
+            background: rgba(0,0,0,0.85);
             z-index: 300;
-            background: rgba(0,0,0,0.75);
-            backdrop-filter: blur(8px);
             display: none;
             align-items: center;
             justify-content: center;
-            padding: 1rem;
+            padding: 2rem;
+            backdrop-filter: blur(6px);
         }
 
         .modal-overlay.open { display: flex; }
 
         .modal-box {
-            background: var(--bg2);
+            background: rgba(6,14,26,0.98);
             border: 1px solid var(--border2);
-            border-radius: 24px;
-            width: 100%;
-            max-width: 520px;
-            max-height: 90vh;
-            overflow-y: auto;
             padding: 2.5rem;
-            animation: fadeInUp 0.3s ease;
+            width: 100%;
+            max-width: 480px;
+            max-height: 85vh;
+            overflow-y: auto;
+            position: relative;
+            clip-path: polygon(16px 0%, 100% 0%, 100% calc(100% - 16px), calc(100% - 16px) 100%, 0% 100%, 0% 16px);
+            box-shadow: var(--glow), var(--glow-purple);
             scrollbar-width: thin;
             scrollbar-color: var(--border) transparent;
+        }
+
+        /* top accent bar */
+        .modal-box::before {
+            content: '';
+            position: absolute;
+            top: 0; left: 0; right: 0;
+            height: 3px;
+            background: linear-gradient(90deg, var(--cyan), var(--purple));
         }
 
         .modal-header { text-align: center; margin-bottom: 2rem; }
 
         .modal-icon {
             display: block;
-            font-size: 2.5rem;
+            font-size: 2rem;
             margin-bottom: 0.75rem;
         }
 
         .modal-header h2 {
-            font-family: var(--font);
-            font-size: 1.5rem;
-            font-weight: 800;
-            color: var(--text);
+            font-family: var(--font-orb);
+            font-size: 1.1rem;
+            font-weight: 900;
+            color: var(--cyan);
             margin-bottom: 0.25rem;
+            letter-spacing: 0.1em;
+            text-transform: uppercase;
+            text-shadow: 0 0 15px rgba(0,255,180,0.3);
         }
 
         .modal-header p {
-            color: var(--text2);
-            font-size: 0.875rem;
-            font-weight: 300;
+            font-family: var(--mono);
+            color: var(--text3);
+            font-size: 0.7rem;
+            letter-spacing: 0.08em;
         }
 
         .form-group { margin-bottom: 1.25rem; }
@@ -1127,40 +1192,40 @@
         .form-group label {
             display: block;
             font-family: var(--mono);
-            font-size: 0.7rem;
+            font-size: 0.65rem;
             color: var(--text2);
-            letter-spacing: 0.1em;
+            letter-spacing: 0.12em;
             text-transform: uppercase;
             margin-bottom: 0.5rem;
         }
 
         .form-group input,
-        .form-group select {
+        .form-group select,
+        .form-group textarea {
             width: 100%;
-            font-family: var(--font);
-            font-size: 0.9rem;
+            font-family: var(--mono);
+            font-size: 0.82rem;
             color: var(--text);
-            background: var(--surface);
+            background: rgba(6,14,26,0.9);
             border: 1px solid var(--border);
-            border-radius: 10px;
             padding: 0.75rem 1rem;
             outline: none;
             transition: border-color 0.2s;
+            resize: vertical;
         }
 
         .form-group input:focus,
-        .form-group select:focus { border-color: var(--cyan); }
+        .form-group select:focus,
+        .form-group textarea:focus { border-color: var(--cyan); box-shadow: 0 0 10px rgba(0,255,180,0.1); }
 
-        .form-group select option { background: var(--surface); }
+        .form-group select option { background: #060e1a; }
 
         .input-pass { position: relative; }
-
         .input-pass input { padding-right: 2.5rem; }
 
         .btn-eye {
             position: absolute;
-            right: 0.75rem;
-            top: 50%;
+            right: 0.75rem; top: 50%;
             transform: translateY(-50%);
             background: none;
             border: none;
@@ -1168,12 +1233,13 @@
             font-size: 1rem;
             padding: 4px;
             line-height: 1;
+            color: var(--text3);
         }
 
         .error-msg {
-            color: #ff6b6b;
+            color: var(--red);
             font-family: var(--mono);
-            font-size: 0.75rem;
+            font-size: 0.7rem;
             text-align: center;
             margin-bottom: 0.75rem;
             min-height: 1rem;
@@ -1181,37 +1247,37 @@
 
         .btn-login {
             width: 100%;
-            font-family: var(--font);
+            font-family: var(--font-orb);
             font-weight: 700;
-            font-size: 0.9rem;
+            font-size: 0.75rem;
             color: var(--bg);
-            background: linear-gradient(135deg, var(--cyan), var(--cyan2));
+            background: var(--cyan);
             border: none;
-            border-radius: 12px;
             padding: 0.9rem;
             cursor: pointer;
             transition: all 0.25s;
-            letter-spacing: 0.03em;
+            letter-spacing: 0.1em;
+            text-transform: uppercase;
             margin-bottom: 0.75rem;
+            box-shadow: var(--glow);
+            clip-path: polygon(10px 0%, 100% 0%, calc(100% - 10px) 100%, 0% 100%);
         }
 
-        .btn-login:hover {
-            transform: translateY(-1px);
-            box-shadow: 0 6px 25px rgba(0,212,255,0.4);
-        }
+        .btn-login:hover { box-shadow: 0 6px 25px rgba(0,255,180,0.4); transform: translateY(-1px); }
 
         .btn-close-modal {
             width: 100%;
-            font-family: var(--font);
+            font-family: var(--mono);
             font-weight: 500;
-            font-size: 0.875rem;
-            color: var(--text2);
-            background: var(--surface);
+            font-size: 0.75rem;
+            color: var(--text3);
+            background: transparent;
             border: 1px solid var(--border);
-            border-radius: 12px;
             padding: 0.75rem;
             cursor: pointer;
             transition: all 0.2s;
+            letter-spacing: 0.08em;
+            text-transform: uppercase;
         }
 
         .btn-close-modal:hover { color: var(--text); border-color: var(--text3); }
@@ -1220,85 +1286,79 @@
 
         .tab {
             flex: 1;
-            font-family: var(--font);
+            font-family: var(--mono);
             font-weight: 600;
-            font-size: 0.8rem;
+            font-size: 0.65rem;
             color: var(--text2);
-            background: var(--surface);
+            background: rgba(6,14,26,0.8);
             border: 1px solid var(--border);
-            border-radius: 10px;
             padding: 0.65rem;
             cursor: pointer;
             transition: all 0.2s;
             text-align: center;
+            letter-spacing: 0.1em;
+            text-transform: uppercase;
         }
 
         .tab:hover { color: var(--cyan); border-color: var(--border2); }
-
-        .tab.active {
-            color: var(--bg);
-            background: var(--cyan);
-            border-color: var(--cyan);
-        }
+        .tab.active { color: var(--bg); background: var(--cyan); border-color: var(--cyan); }
 
         .tab-content { display: none; }
         .tab-content.active { display: block; }
 
-        .tipo-selector {
-            display: flex;
-            gap: 0.5rem;
-            margin-bottom: 1.25rem;
-        }
+        .tipo-selector { display: flex; gap: 0.5rem; margin-bottom: 1.25rem; }
 
         .tipo-btn {
             flex: 1;
-            font-family: var(--font);
+            font-family: var(--mono);
             font-weight: 500;
-            font-size: 0.8rem;
+            font-size: 0.65rem;
             color: var(--text2);
-            background: var(--surface);
+            background: rgba(6,14,26,0.8);
             border: 1px solid var(--border);
-            border-radius: 10px;
             padding: 0.6rem;
             cursor: pointer;
             transition: all 0.2s;
+            letter-spacing: 0.08em;
+            text-transform: uppercase;
         }
 
         .tipo-btn.active {
             color: var(--cyan);
             border-color: var(--cyan);
-            background: rgba(0,212,255,0.07);
+            background: rgba(0,255,180,0.06);
+            box-shadow: 0 0 10px rgba(0,255,180,0.1);
         }
 
         .drop-zone {
             border: 2px dashed var(--border2);
-            border-radius: 12px;
-            padding: 2.5rem 1.5rem;
+            padding: 2rem 1.5rem;
             text-align: center;
             cursor: pointer;
             transition: all 0.2s;
             margin-bottom: 1rem;
         }
 
-        .drop-zone:hover { border-color: var(--cyan); background: rgba(0,212,255,0.04); }
-
-        .drop-zone.dragover { border-color: var(--cyan2); background: rgba(0,245,196,0.06); }
+        .drop-zone:hover { border-color: var(--cyan); background: rgba(0,255,180,0.03); }
+        .drop-zone.dragover { border-color: var(--cyan); background: rgba(0,255,180,0.05); }
 
         .drop-icon { font-size: 2rem; margin-bottom: 0.5rem; }
 
         .drop-text {
-            font-family: var(--font);
+            font-family: var(--font-orb);
             font-weight: 600;
-            font-size: 0.9rem;
+            font-size: 0.7rem;
             color: var(--text);
             margin-bottom: 0.25rem;
+            letter-spacing: 0.05em;
+            text-transform: uppercase;
         }
 
-        .drop-sub { font-size: 0.8rem; color: var(--text3); margin-bottom: 0.5rem; }
+        .drop-sub { font-family: var(--mono); font-size: 0.65rem; color: var(--text3); margin-bottom: 0.5rem; }
 
         .drop-tipos {
             font-family: var(--mono);
-            font-size: 0.65rem;
+            font-size: 0.6rem;
             color: var(--text3);
             letter-spacing: 0.06em;
         }
@@ -1308,104 +1368,188 @@
             align-items: center;
             gap: 12px;
             padding: 0.75rem 1rem;
-            background: rgba(0,245,196,0.06);
-            border: 1px solid rgba(0,245,196,0.2);
-            border-radius: 10px;
-            font-size: 0.82rem;
-            color: var(--cyan2);
+            background: rgba(0,255,180,0.05);
+            border: 1px solid rgba(0,255,180,0.2);
+            font-family: var(--mono);
+            font-size: 0.75rem;
+            color: var(--cyan);
             margin-bottom: 1rem;
+        }
+
+        /* imagen preview in upload */
+        .img-preview-thumb {
+            max-width: 100%;
+            max-height: 100px;
+            object-fit: cover;
+            border: 1px solid var(--border2);
+            margin-bottom: 0.5rem;
+            display: block;
         }
 
         .hint {
             display: block;
             font-family: var(--mono);
-            font-size: 0.68rem;
+            font-size: 0.62rem;
             color: var(--text3);
             margin-top: 0.4rem;
+            letter-spacing: 0.04em;
         }
 
         .upload-msg {
             text-align: center;
-            font-size: 0.82rem;
+            font-family: var(--mono);
+            font-size: 0.72rem;
             margin-bottom: 0.75rem;
             min-height: 1.2em;
         }
 
         .btn-upload {
             width: 100%;
-            font-family: var(--font);
+            font-family: var(--font-orb);
             font-weight: 700;
-            font-size: 0.9rem;
+            font-size: 0.75rem;
             color: var(--bg);
-            background: linear-gradient(135deg, var(--cyan), var(--cyan2));
+            background: var(--cyan);
             border: none;
-            border-radius: 12px;
             padding: 0.9rem;
             cursor: pointer;
             transition: all 0.25s;
+            letter-spacing: 0.1em;
+            text-transform: uppercase;
+            box-shadow: var(--glow);
+            clip-path: polygon(10px 0%, 100% 0%, calc(100% - 10px) 100%, 0% 100%);
         }
 
-        .btn-upload:hover {
-            transform: translateY(-1px);
-            box-shadow: 0 6px 25px rgba(0,212,255,0.4);
-        }
+        .btn-upload:hover { transform: translateY(-1px); box-shadow: 0 6px 25px rgba(0,255,180,0.4); }
 
         .lista-admin { display: flex; flex-direction: column; gap: 0.75rem; }
 
         .admin-item {
             display: flex;
             align-items: center;
-            gap: 12px;
+            gap: 10px;
             padding: 0.85rem 1rem;
-            background: var(--surface);
+            background: rgba(6,14,26,0.8);
             border: 1px solid var(--border);
-            border-radius: 10px;
+            transition: border-color 0.2s;
         }
+
+        .admin-item:hover { border-color: var(--border2); }
 
         .admin-item-info { flex: 1; }
 
         .admin-item-title {
-            font-family: var(--font);
-            font-size: 0.85rem;
+            font-family: var(--font-body);
+            font-size: 0.875rem;
             font-weight: 600;
             color: var(--text);
         }
 
         .admin-item-semana {
             font-family: var(--mono);
-            font-size: 0.65rem;
+            font-size: 0.6rem;
             color: var(--cyan);
+            letter-spacing: 0.08em;
         }
 
-        .btn-delete {
+        .admin-item-actions { display: flex; gap: 6px; }
+
+        .btn-delete, .btn-edit {
             background: none;
-            border: none;
-            color: var(--text3);
+            border: 1px solid transparent;
             cursor: pointer;
-            padding: 6px;
-            border-radius: 6px;
-            font-size: 0.9rem;
+            padding: 5px 8px;
+            font-size: 0.75rem;
             transition: all 0.2s;
+            font-family: var(--mono);
         }
 
-        .btn-delete:hover { color: #ff6b6b; background: rgba(255,107,107,0.1); }
+        .btn-delete { color: var(--text3); }
+        .btn-delete:hover { color: var(--red); border-color: rgba(255,68,68,0.3); background: rgba(255,68,68,0.08); }
+
+        .btn-edit { color: var(--text3); }
+        .btn-edit:hover { color: var(--cyan); border-color: var(--border2); background: rgba(0,255,180,0.06); }
+
+        /* Edit form inline */
+        .edit-form {
+            display: none;
+            background: rgba(0,255,180,0.03);
+            border: 1px solid var(--border2);
+            padding: 1rem;
+            margin-bottom: 0.75rem;
+            flex-direction: column;
+            gap: 0.75rem;
+        }
+
+        .edit-form.open { display: flex; }
+
+        .edit-form input, .edit-form select {
+            font-family: var(--mono);
+            font-size: 0.78rem;
+            color: var(--text);
+            background: rgba(6,14,26,0.9);
+            border: 1px solid var(--border);
+            padding: 0.6rem 0.8rem;
+            outline: none;
+            width: 100%;
+        }
+
+        .edit-form input:focus { border-color: var(--cyan); }
+
+        .edit-form-label {
+            font-family: var(--mono);
+            font-size: 0.6rem;
+            color: var(--text3);
+            letter-spacing: 0.1em;
+            text-transform: uppercase;
+            margin-bottom: 4px;
+            display: block;
+        }
+
+        .edit-form-row { display: flex; gap: 0.5rem; }
+
+        .btn-save-edit {
+            font-family: var(--mono);
+            font-size: 0.65rem;
+            color: var(--bg);
+            background: var(--cyan);
+            border: none;
+            padding: 0.5rem 1rem;
+            cursor: pointer;
+            letter-spacing: 0.08em;
+            text-transform: uppercase;
+            clip-path: polygon(6px 0%, 100% 0%, calc(100% - 6px) 100%, 0% 100%);
+        }
+
+        .btn-cancel-edit {
+            font-family: var(--mono);
+            font-size: 0.65rem;
+            color: var(--text3);
+            background: transparent;
+            border: 1px solid var(--border);
+            padding: 0.5rem 1rem;
+            cursor: pointer;
+            letter-spacing: 0.08em;
+            text-transform: uppercase;
+        }
 
         .btn-logout {
             width: 100%;
-            font-family: var(--font);
+            font-family: var(--mono);
             font-weight: 500;
-            font-size: 0.875rem;
+            font-size: 0.75rem;
             color: var(--text3);
             background: none;
             border: 1px solid var(--border);
-            border-radius: 12px;
             padding: 0.75rem;
             cursor: pointer;
             transition: all 0.2s;
             margin-top: 1.5rem;
+            letter-spacing: 0.08em;
+            text-transform: uppercase;
         }
 
-        .btn-logout:hover { color: #ff6b6b; border-color: rgba(255,107,107,0.3); }
+        .btn-logout:hover { color: var(--red); border-color: rgba(255,68,68,0.3); }
 
         /* ═══════════════════════════════════════════
            TOAST
@@ -1416,25 +1560,22 @@
             left: 50%;
             transform: translateX(-50%) translateY(20px);
             z-index: 500;
-            font-family: var(--font);
-            font-size: 0.875rem;
+            font-family: var(--mono);
+            font-size: 0.75rem;
             font-weight: 500;
             color: var(--bg);
             background: var(--cyan);
-            border-radius: 100px;
             padding: 0.65rem 1.5rem;
             opacity: 0;
             transition: all 0.35s ease;
             white-space: nowrap;
             pointer-events: none;
+            letter-spacing: 0.06em;
+            clip-path: polygon(10px 0%, 100% 0%, calc(100% - 10px) 100%, 0% 100%);
         }
 
-        .toast.show {
-            opacity: 1;
-            transform: translateX(-50%) translateY(0);
-        }
-
-        .toast.error { background: #ff6b6b; }
+        .toast.show { opacity: 1; transform: translateX(-50%) translateY(0); }
+        .toast.error { background: var(--red); }
 
         /* ═══════════════════════════════════════════
            FOOTER
@@ -1445,20 +1586,17 @@
             border-top: 1px solid var(--border);
             padding: 2rem;
             text-align: center;
+            background: rgba(3,6,9,0.9);
         }
 
         footer p {
             font-family: var(--mono);
-            font-size: 0.72rem;
+            font-size: 0.65rem;
             color: var(--text3);
-            letter-spacing: 0.06em;
+            letter-spacing: 0.08em;
         }
 
-        footer .footer-sub {
-            margin-top: 0.25rem;
-            color: var(--text3);
-        }
-
+        footer .footer-sub { margin-top: 0.25rem; }
         footer .footer-sub span { color: var(--cyan); }
 
         /* ═══════════════════════════════════════════
@@ -1468,8 +1606,9 @@
             .nav-links { display: none; }
             .hamburger { display: flex; }
             .sobre-card { grid-template-columns: 1fr; gap: 2rem; }
-            .foto-wrap { justify-content: flex-start; }
+            .foto-wrap { align-items: center; }
             .hero-stats { gap: 1.5rem; }
+            .hero-title { font-size: clamp(2rem, 12vw, 4rem); }
             .chat-window { width: calc(100vw - 2rem); right: 1rem; bottom: 5rem; }
             .semanas-grid { grid-template-columns: 1fr; }
         }
@@ -1477,7 +1616,13 @@
 </head>
 <body>
 
-<!-- BG CANVAS -->
+<!-- FONDO UNIVERSIDAD UPLA - FIJO EN TODO EL SITIO -->
+<div class="site-bg">
+    <img src="Taller_de_edición_en_la_UPLA,_Huancayo_01.jpg" alt="" class="site-bg-img">
+    <div class="site-bg-overlay"></div>
+</div>
+
+<!-- BG CANVAS PARTÍCULAS -->
 <canvas id="bgCanvas"></canvas>
 
 <!-- NAVBAR -->
@@ -1492,10 +1637,10 @@
         </div>
     </a>
     <nav class="nav-links">
-        <a href="#inicio" class="nav-link">Inicio</a>
-        <a href="#sobre" class="nav-link">Perfil</a>
-        <a href="#semanas" class="nav-link">Semanas</a>
-        <button onclick="abrirAdmin()" class="btn-admin">⚡ Admin</button>
+        <a href="#inicio" class="nav-link">// Inicio</a>
+        <a href="#sobre" class="nav-link">// Perfil</a>
+        <a href="#semanas" class="nav-link">// Semanas</a>
+        <button onclick="abrirAdmin()" class="btn-admin">⚡ Admin_Panel</button>
     </nav>
     <button class="hamburger" id="hamburger" onclick="toggleMenu()" aria-label="Menú">
         <span></span><span></span><span></span>
@@ -1504,30 +1649,38 @@
 
 <!-- MOBILE MENU -->
 <div class="mobile-menu" id="mobileMenu">
-    <a href="#inicio" onclick="toggleMenu()">Inicio</a>
-    <a href="#sobre" onclick="toggleMenu()">Perfil</a>
-    <a href="#semanas" onclick="toggleMenu()">Semanas</a>
-    <button onclick="toggleMenu(); abrirAdmin()">⚡ Admin</button>
+    <a href="#inicio" onclick="toggleMenu()">// Inicio</a>
+    <a href="#sobre" onclick="toggleMenu()">// Perfil</a>
+    <a href="#semanas" onclick="toggleMenu()">// Semanas</a>
+    <button onclick="toggleMenu(); abrirAdmin()">⚡ Admin_Panel</button>
 </div>
 
 <!-- HERO -->
 <section id="inicio" class="hero">
-    <div class="hero-bg">
+    <!-- imagen UPLA también visible aquí con más brillo que el global -->
+    <div class="hero-upla-bg">
         <img src="Taller_de_edición_en_la_UPLA,_Huancayo_01.jpg" alt="UPLA Facultad de Ingeniería">
         <div class="hero-overlay"></div>
         <div class="hero-grid"></div>
     </div>
+
+    <!-- corner decorations -->
+    <div class="hero-corner tl"></div>
+    <div class="hero-corner tr"></div>
+    <div class="hero-corner bl"></div>
+    <div class="hero-corner br"></div>
+
     <div class="hero-content">
-        <div class="hero-badge">🎓 Ingeniería de Sistemas y Computación</div>
+        <div class="hero-badge">🎓 Ingeniería de Sistemas · UPLA 2026</div>
         <h1 class="hero-title">
             <span class="title-line">PHOL</span>
             <span class="title-line accent">ANTONI</span>
         </h1>
-        <p class="hero-sub">Repositorio académico · Base de Datos II</p>
-        <p class="hero-desc">Un archivo vivo de trabajos, proyectos y aprendizaje continuo a lo largo del curso de Base de Datos II en la UPLA.</p>
+        <p class="hero-sub">Repositorio Académico · <span>Base de Datos II</span></p>
+        <p class="hero-desc">Un archivo vivo de trabajos, proyectos y aprendizaje continuo a lo largo del curso de Base de Datos II en la UPLA, Huancayo.</p>
         <div class="hero-btns">
-            <a href="#semanas" class="btn-primary">Ver Repositorio →</a>
-            <a href="#sobre" class="btn-ghost">Mi Perfil</a>
+            <a href="#semanas" class="btn-primary">▶ Ver Repositorio</a>
+            <a href="#sobre" class="btn-ghost">◈ Mi Perfil</a>
         </div>
         <div class="hero-stats">
             <div class="stat"><span id="statSemanas">0</span><small>Semanas</small></div>
@@ -1541,15 +1694,16 @@
 <section id="sobre" class="sobre">
     <div class="container">
         <div class="section-header">
-            <span class="section-tag">// about_me</span>
+            <span class="section-tag">// 01 — about_me.exe</span>
             <h2>Mi Perfil</h2>
             <p>Estudiante de Ingeniería de Sistemas, UPLA Huancayo</p>
+            <span class="section-line"></span>
         </div>
         <div class="sobre-card">
             <div class="foto-wrap">
                 <div class="foto-frame">
                     <img src="WhatsApp Image 2025-09-29 at 10.46.00 PM.jpeg" class="foto" alt="Phol Antoni Canez Quispe"
-                         onerror="this.src='data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 width=%22220%22 height=%22280%22><rect fill=%22%230d1428%22 width=%22220%22 height=%22280%22/><text fill=%22%2300d4ff%22 font-size=%22100%22 x=%2250%25%22 y=%2255%25%22 text-anchor=%22middle%22>👨‍💻</text></svg>'">
+                         onerror="this.src='data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 width=%22220%22 height=%22280%22><rect fill=%22%23060e1a%22 width=%22220%22 height=%22280%22/><text fill=%22%2300ffb4%22 font-size=%22100%22 x=%2250%25%22 y=%2255%25%22 text-anchor=%22middle%22>👨‍💻</text></svg>'">
                 </div>
                 <div class="foto-glow"></div>
             </div>
@@ -1584,18 +1738,19 @@
 <section id="semanas" class="semanas">
     <div class="container">
         <div class="section-header">
-            <span class="section-tag">// repositorio</span>
+            <span class="section-tag">// 02 — repository.sql</span>
             <h2>Semanas del Curso</h2>
             <p>Todos los trabajos organizados por semana</p>
+            <span class="section-line"></span>
         </div>
         <div class="filtros">
-            <button class="filtro-btn active" onclick="filtrarSemana('all', this)">Todas</button>
+            <button class="filtro-btn active" onclick="filtrarSemana('all', this)">[ TODAS ]</button>
             <div id="filtrosBtns" style="display:contents"></div>
         </div>
         <div id="gridSemanas" class="semanas-grid">
             <div class="loading-state">
                 <div class="spinner"></div>
-                <p>Cargando trabajos...</p>
+                <p style="font-family:var(--mono);font-size:0.75rem">Cargando datos...</p>
             </div>
         </div>
     </div>
@@ -1608,23 +1763,23 @@
         <div id="panelLogin">
             <div class="modal-header">
                 <span class="modal-icon">🔐</span>
-                <h2>Acceso Administrativo</h2>
-                <p>Ingresa tus credenciales para continuar</p>
+                <h2>Auth_Required</h2>
+                <p>Ingresa credenciales de operador</p>
             </div>
             <div class="form-group">
-                <label>Usuario</label>
+                <label>// Usuario</label>
                 <input type="text" id="inputUser" placeholder="admin" autocomplete="off">
             </div>
             <div class="form-group">
-                <label>Contraseña</label>
+                <label>// Contraseña</label>
                 <div class="input-pass">
-                    <input type="password" id="inputPass" placeholder="---------" onkeydown="if(event.key==='Enter')verificarLogin()">
+                    <input type="password" id="inputPass" placeholder="••••••••••" onkeydown="if(event.key==='Enter')verificarLogin()">
                     <button onclick="togglePass()" class="btn-eye">👁</button>
                 </div>
             </div>
             <div id="loginError" class="error-msg"></div>
-            <button onclick="verificarLogin()" class="btn-login">Ingresar al Sistema</button>
-            <button onclick="cerrarAdmin()" class="btn-close-modal">✕ Cerrar</button>
+            <button onclick="verificarLogin()" class="btn-login">▶ Ejecutar Login</button>
+            <button onclick="cerrarAdmin()" class="btn-close-modal">✕ Cancelar</button>
         </div>
 
         <!-- ADMIN PANEL -->
@@ -1642,45 +1797,69 @@
             <!-- TAB SUBIR -->
             <div id="tabSubir" class="tab-content active">
                 <div class="form-group">
-                    <label>Semana</label>
+                    <label>// Semana</label>
                     <select id="admSemana">
                         <option value="">Selecciona una semana...</option>
                         <script>for(let i=1;i<=16;i++)document.write(`<option value="Semana ${i}">Semana ${i}</option>`)</script>
                     </select>
                 </div>
                 <div class="form-group">
-                    <label>Título del Trabajo</label>
+                    <label>// Título del Trabajo</label>
                     <input type="text" id="admTitulo" placeholder="Ej: Informe Técnico de Base de Datos">
                 </div>
                 <div class="tipo-selector">
-                    <button class="tipo-btn active" id="btnTipoArchivo" onclick="setTipo('archivo')">📁 Archivo</button>
-                    <button class="tipo-btn" id="btnTipoLink" onclick="setTipo('link')">🔗 Enlace</button>
+                    <button class="tipo-btn active" id="btnTipoArchivo" onclick="setTipo('archivo')">📁 Archivo/PDF</button>
+                    <button class="tipo-btn" id="btnTipoLink" onclick="setTipo('link')">🔗 Enlace URL</button>
+                    <button class="tipo-btn" id="btnTipoImg" onclick="setTipo('imagen')">🖼 Imagen</button>
                 </div>
+
+                <!-- ZONA ARCHIVO -->
                 <div id="zonaArchivo">
                     <div id="dropZone" class="drop-zone" onclick="document.getElementById('inputFile').click()">
                         <div class="drop-icon">☁️</div>
                         <div class="drop-text">Arrastra tu archivo aquí</div>
                         <div class="drop-sub">o haz clic para buscar</div>
-                        <div class="drop-tipos">PDF · Word · Excel · PowerPoint · Imágenes</div>
-                        <input type="file" id="inputFile" accept=".pdf,.doc,.docx,.ppt,.pptx,.xls,.xlsx,.jpg,.jpeg,.png,.txt" style="display:none">
+                        <div class="drop-tipos">PDF · Word · Excel · PowerPoint · TXT</div>
+                        <input type="file" id="inputFile" accept=".pdf,.doc,.docx,.ppt,.pptx,.xls,.xlsx,.txt" style="display:none">
                     </div>
                     <div id="archivoPreview"></div>
                 </div>
+
+                <!-- ZONA LINK -->
                 <div id="zonaLink" style="display:none">
                     <div class="form-group">
-                        <label>URL del trabajo</label>
+                        <label>// URL del trabajo</label>
                         <input type="url" id="admEnlace" placeholder="https://drive.google.com/...">
                         <small class="hint">✅ Google Drive, PDF.ac, Canva, GitHub, OneDrive</small>
                     </div>
                 </div>
+
+                <!-- ZONA IMAGEN -->
+                <div id="zonaImagen" style="display:none">
+                    <div id="dropZoneImg" class="drop-zone" onclick="document.getElementById('inputImagen').click()">
+                        <div class="drop-icon">🖼️</div>
+                        <div class="drop-text">Sube una imagen</div>
+                        <div class="drop-sub">o haz clic para buscar</div>
+                        <div class="drop-tipos">JPG · PNG · WEBP · GIF</div>
+                        <input type="file" id="inputImagen" accept="image/*" style="display:none">
+                    </div>
+                    <div id="imagenPreview"></div>
+                    <div class="form-group" style="margin-top:0.5rem">
+                        <label>// URL de imagen (alternativa)</label>
+                        <input type="url" id="admImagenUrl" placeholder="https://... (si no subes archivo)">
+                        <small class="hint">Pega un link de imagen directo</small>
+                    </div>
+                </div>
+
                 <div id="uploadMsg" class="upload-msg"></div>
                 <button onclick="subirTrabajo()" id="btnSubir" class="btn-upload">⬆ Publicar Trabajo</button>
             </div>
 
-            <!-- TAB LISTA -->
+            <!-- TAB LISTA / EDITAR -->
             <div id="tabLista" class="tab-content">
+                <div id="editFormContainer"></div>
                 <div id="listaAdmin" class="lista-admin">
-                    <div class="loading-state"><div class="spinner"></div><p>Cargando...</p></div>
+                    <div class="loading-state"><div class="spinner"></div></div>
                 </div>
             </div>
 
@@ -1704,9 +1883,9 @@
         <div class="chat-suggestions" id="chatSuggestions"></div>
         <div class="chat-input-area">
             <input class="chat-input" id="chatInput" type="text"
-                   placeholder="Pregunta sobre Base de Datos II..."
+                   placeholder="Pregunta sobre BD II..."
                    onkeydown="if(event.key==='Enter')enviarMensaje()">
-            <button class="chat-send" id="chatSend" onclick="enviarMensaje()">➤</button>
+            <button class="chat-send" id="chatSend" onclick="enviarMensaje()">▶</button>
         </div>
     </div>
     <button class="chat-toggle" onclick="toggleChat()" title="Asistente IA">
@@ -1725,29 +1904,25 @@
 
 <script>
 /* ═══════════════════════════════════════════
-   CANVAS PARTICLES
+   CANVAS PARTÍCULAS
 ═══════════════════════════════════════════ */
 (function() {
     const canvas = document.getElementById('bgCanvas');
     const ctx = canvas.getContext('2d');
-    let W, H, particles = [], lines = [];
+    let W, H, particles = [];
 
-    function resize() {
-        W = canvas.width = window.innerWidth;
-        H = canvas.height = window.innerHeight;
-    }
+    function resize() { W = canvas.width = window.innerWidth; H = canvas.height = window.innerHeight; }
 
     function createParticles() {
         particles = [];
-        const count = Math.floor((W * H) / 18000);
+        const count = Math.floor((W * H) / 20000);
         for (let i = 0; i < count; i++) {
             particles.push({
-                x: Math.random() * W,
-                y: Math.random() * H,
-                vx: (Math.random() - 0.5) * 0.3,
-                vy: (Math.random() - 0.5) * 0.3,
-                r: Math.random() * 1.5 + 0.5,
-                opacity: Math.random() * 0.5 + 0.1
+                x: Math.random() * W, y: Math.random() * H,
+                vx: (Math.random() - 0.5) * 0.25, vy: (Math.random() - 0.5) * 0.25,
+                r: Math.random() * 1.5 + 0.3,
+                opacity: Math.random() * 0.4 + 0.1,
+                color: Math.random() > 0.7 ? '176,96,255' : '0,255,180'
             });
         }
     }
@@ -1756,28 +1931,23 @@
         ctx.clearRect(0, 0, W, H);
         particles.forEach(p => {
             p.x += p.vx; p.y += p.vy;
-            if (p.x < 0) p.x = W;
-            if (p.x > W) p.x = 0;
-            if (p.y < 0) p.y = H;
-            if (p.y > H) p.y = 0;
-
+            if (p.x < 0) p.x = W; if (p.x > W) p.x = 0;
+            if (p.y < 0) p.y = H; if (p.y > H) p.y = 0;
             ctx.beginPath();
             ctx.arc(p.x, p.y, p.r, 0, Math.PI * 2);
-            ctx.fillStyle = `rgba(0, 212, 255, ${p.opacity})`;
+            ctx.fillStyle = `rgba(${p.color}, ${p.opacity})`;
             ctx.fill();
         });
-
-        // Draw connections
         for (let i = 0; i < particles.length; i++) {
             for (let j = i + 1; j < particles.length; j++) {
                 const dx = particles[i].x - particles[j].x;
                 const dy = particles[i].y - particles[j].y;
-                const dist = Math.sqrt(dx * dx + dy * dy);
-                if (dist < 130) {
+                const dist = Math.sqrt(dx*dx + dy*dy);
+                if (dist < 120) {
                     ctx.beginPath();
                     ctx.moveTo(particles[i].x, particles[i].y);
                     ctx.lineTo(particles[j].x, particles[j].y);
-                    ctx.strokeStyle = `rgba(0, 212, 255, ${(1 - dist / 130) * 0.08})`;
+                    ctx.strokeStyle = `rgba(0,255,180,${(1 - dist/120) * 0.06})`;
                     ctx.lineWidth = 0.5;
                     ctx.stroke();
                 }
@@ -1794,7 +1964,8 @@
    NAVBAR SCROLL
 ═══════════════════════════════════════════ */
 window.addEventListener('scroll', () => {
-    document.getElementById('navbar').classList.toggle('scrolled', window.scrollY > 50);
+    document.getElementById('navbar').style.boxShadow =
+        window.scrollY > 50 ? '0 4px 30px rgba(0,0,0,0.6)' : '';
 });
 
 /* ═══════════════════════════════════════════
@@ -1808,7 +1979,7 @@ function toggleMenu() {
    DATOS & RENDER
 ═══════════════════════════════════════════ */
 const STORAGE_KEY = 'phol_db2_trabajos';
-const DATA_VERSION = 'v2_16semanas';
+const DATA_VERSION = 'v3_gamer';
 let allData = {};
 let currentFilter = 'all';
 
@@ -1831,108 +2002,51 @@ function saveLocalData(data) {
 
 async function loadData() {
     const local = getLocalData();
-    if (local) {
-        allData = local;
-        renderAll();
-        return;
-    }
+    if (local) { allData = local; renderAll(); return; }
     try {
         const r = await fetch('datos.json');
         const raw = await r.text();
-        // Handle duplicate JSON object issue in datos.json
-        const cleanJson = raw.trim();
-        const firstEnd = cleanJson.indexOf('}') + 1;
-        let parsed;
-        try {
-            parsed = JSON.parse(cleanJson.substring(0, firstEnd > cleanJson.length / 2 ? cleanJson.length : firstEnd));
-        } catch {
-            parsed = JSON.parse(cleanJson);
+        try { allData = JSON.parse(raw); } catch {
+            // handle double JSON
+            const idx = raw.indexOf('}{');
+            if (idx !== -1) allData = JSON.parse(raw.substring(0, idx + 1));
+            else allData = getDefaultData();
         }
-        // If parsing gives a non-standard result, fallback
-        allData = parsed && typeof parsed === 'object' ? parsed : {};
-    } catch {
-        allData = getDefaultData();
-    }
+    } catch { allData = getDefaultData(); }
     renderAll();
 }
 
 function getDefaultData() {
     return {
-        "Semana 1": {
-            "info": "Introducción a la base de datos",
-            "tareas": {
-                "1": { "titulo": "Informe Técnico", "enlace": "https://pdf.ac/QONm7fAQ0" },
-                "2": { "titulo": "Tipo de Arquitectura de base de datos", "enlace": "https://pdf.ac/jMfm6OxFcq" }
-            }
-        },
-        "Semana 2": {
-            "info": "Gestores de base de datos.",
-            "tareas": {
-                "1": { "titulo": "Diagrama de Entidad Relación", "enlace": "https://pdf.ac/ofEHoVEu" },
-                "2": { "titulo": "Manual de Instalación de SQL Server 2025 Developer Edition", "enlace": "https://pdf.ac/SnbDbYHOV" }
-            }
-        },
-        "Semana 3": {
-            "info": "Diseño de arquitectura de base de datos.",
-            "tareas": {
-                "1": { "titulo": "Diseño de arquitectura de base de datos", "enlace": "https://canva.link/xgfegwk4o2uuq37" }
-            }
-        },
-        "Semana 4": {
-            "info": "Manejo de Transacciones y Procedimientos Almacenados.",
-            "tareas": { "1": { "titulo": "Guía de Procedimientos", "enlace": "#" } }
-        },
-        "Semana 5": {
-            "info": "Triggers y Automatización de Procesos en BD.",
-            "tareas": {
-                "1": { "titulo": "Scripts de Automatización", "enlace": "#" },
-                "2": { "titulo": "Práctica Calificada", "enlace": "#" }
-            }
-        },
-        "Semana 6": {
-            "info": "Vistas, Funciones y Consultas Avanzadas.",
-            "tareas": { "1": { "titulo": "Informe de Vistas y Funciones", "enlace": "#" } }
-        },
-        "Semana 7": {
-            "info": "Seguridad y Control de Acceso en BD.",
-            "tareas": { "1": { "titulo": "Configuración de Roles y Permisos", "enlace": "#" } }
-        },
-        "Semana 8": {
-            "info": "Examen Parcial — Evaluación Integral.",
-            "tareas": { "1": { "titulo": "Examen Parcial", "enlace": "#" } }
-        },
-        "Semana 9": {
-            "info": "Optimización de Consultas e Índices.",
-            "tareas": { "1": { "titulo": "Informe de Optimización", "enlace": "#" } }
-        },
-        "Semana 10": {
-            "info": "Bases de Datos Distribuidas.",
-            "tareas": { "1": { "titulo": "Diseño de BD Distribuida", "enlace": "#" } }
-        },
-        "Semana 11": {
-            "info": "NoSQL — MongoDB y Bases de Datos no relacionales.",
-            "tareas": { "1": { "titulo": "Práctica con MongoDB", "enlace": "#" } }
-        },
-        "Semana 12": {
-            "info": "Data Warehousing y Business Intelligence.",
-            "tareas": { "1": { "titulo": "Diseño de Data Warehouse", "enlace": "#" } }
-        },
-        "Semana 13": {
-            "info": "Backup, Restauración y Alta Disponibilidad.",
-            "tareas": { "1": { "titulo": "Plan de Backup y Recuperación", "enlace": "#" } }
-        },
-        "Semana 14": {
-            "info": "Integración de BD con Aplicaciones Web.",
-            "tareas": { "1": { "titulo": "Conexión BD-Aplicación", "enlace": "#" } }
-        },
-        "Semana 15": {
-            "info": "Proyecto Final — Desarrollo e Implementación.",
-            "tareas": { "1": { "titulo": "Proyecto Final Integrador", "enlace": "#" } }
-        },
-        "Semana 16": {
-            "info": "Examen Final y Sustentación del Proyecto.",
-            "tareas": { "1": { "titulo": "Examen Final", "enlace": "#" } }
-        }
+        "Semana 1": { "info": "Introducción a la base de datos", "tareas": {
+            "1": { "titulo": "Informe Técnico", "enlace": "https://pdf.ac/QONm7fAQ0" },
+            "2": { "titulo": "Tipo de Arquitectura de base de datos", "enlace": "https://pdf.ac/jMfm6OxFcq" }
+        }},
+        "Semana 2": { "info": "Gestores de base de datos.", "tareas": {
+            "1": { "titulo": "Diagrama de Entidad Relación", "enlace": "https://pdf.ac/ofEHoVEu" },
+            "2": { "titulo": "Manual de Instalación de SQL Server 2025 Developer Edition", "enlace": "https://pdf.ac/SnbDbYHOV" }
+        }},
+        "Semana 3": { "info": "Diseño de arquitectura de base de datos.", "tareas": {
+            "1": { "titulo": "Diseño de arquitectura de base de datos", "enlace": "https://canva.link/xgfegwk4o2uuq37" }
+        }},
+        "Semana 4": { "info": "Manejo de Transacciones y Procedimientos Almacenados.", "tareas": {
+            "1": { "titulo": "Guía de Procedimientos", "enlace": "#" }
+        }},
+        "Semana 5": { "info": "Triggers y Automatización de Procesos en BD.", "tareas": {
+            "1": { "titulo": "Scripts de Automatización", "enlace": "#" },
+            "2": { "titulo": "Práctica Calificada", "enlace": "#" }
+        }},
+        "Semana 6": { "info": "Vistas, Funciones y Consultas Avanzadas.", "tareas": { "1": { "titulo": "Informe de Vistas y Funciones", "enlace": "#" } }},
+        "Semana 7": { "info": "Seguridad y Control de Acceso en BD.", "tareas": { "1": { "titulo": "Configuración de Roles y Permisos", "enlace": "#" } }},
+        "Semana 8": { "info": "Examen Parcial — Evaluación Integral.", "tareas": { "1": { "titulo": "Examen Parcial", "enlace": "#" } }},
+        "Semana 9": { "info": "Optimización de Consultas e Índices.", "tareas": { "1": { "titulo": "Informe de Optimización", "enlace": "#" } }},
+        "Semana 10": { "info": "Bases de Datos Distribuidas.", "tareas": { "1": { "titulo": "Diseño de BD Distribuida", "enlace": "#" } }},
+        "Semana 11": { "info": "NoSQL — MongoDB y Bases de Datos no relacionales.", "tareas": { "1": { "titulo": "Práctica con MongoDB", "enlace": "#" } }},
+        "Semana 12": { "info": "Data Warehousing y Business Intelligence.", "tareas": { "1": { "titulo": "Diseño de Data Warehouse", "enlace": "#" } }},
+        "Semana 13": { "info": "Backup, Restauración y Alta Disponibilidad.", "tareas": { "1": { "titulo": "Plan de Backup y Recuperación", "enlace": "#" } }},
+        "Semana 14": { "info": "Integración de BD con Aplicaciones Web.", "tareas": { "1": { "titulo": "Conexión BD-Aplicación", "enlace": "#" } }},
+        "Semana 15": { "info": "Proyecto Final — Desarrollo e Implementación.", "tareas": { "1": { "titulo": "Proyecto Final Integrador", "enlace": "#" } }},
+        "Semana 16": { "info": "Examen Final y Sustentación del Proyecto.", "tareas": { "1": { "titulo": "Examen Final", "enlace": "#" } }}
     };
 }
 
@@ -1943,6 +2057,7 @@ function getFileIcon(enlace) {
     if (enlace.includes('github')) return '💻';
     if (enlace.includes('pdf')) return '📕';
     if (enlace.includes('onedrive') || enlace.includes('sharepoint')) return '📘';
+    if (enlace.match(/\.(jpg|jpeg|png|gif|webp)$/i)) return '🖼';
     return '🔗';
 }
 
@@ -1957,9 +2072,7 @@ function renderAll() {
 
 function updateStats(semanas) {
     let total = 0;
-    semanas.forEach(s => {
-        total += Object.keys(allData[s]?.tareas || {}).length;
-    });
+    semanas.forEach(s => { total += Object.keys(allData[s]?.tareas || {}).length; });
     document.getElementById('statSemanas').setAttribute('data-target', semanas.length);
     document.getElementById('statTrabajos').setAttribute('data-target', total);
 }
@@ -1967,7 +2080,7 @@ function updateStats(semanas) {
 function renderFiltros(semanas) {
     const container = document.getElementById('filtrosBtns');
     container.innerHTML = semanas.map(s =>
-        `<button class="filtro-btn" onclick="filtrarSemana('${s}', this)">${s}</button>`
+        `<button class="filtro-btn" onclick="filtrarSemana('${s}', this)">[ ${s.replace('Semana ', 'S')} ]</button>`
     ).join('');
 }
 
@@ -1980,12 +2093,10 @@ function filtrarSemana(filter, btn) {
 
 function renderGrid(semanas) {
     const grid = document.getElementById('gridSemanas');
-    const filtered = currentFilter === 'all'
-        ? semanas
-        : semanas.filter(s => s === currentFilter);
+    const filtered = currentFilter === 'all' ? semanas : semanas.filter(s => s === currentFilter);
 
-    if (filtered.length === 0) {
-        grid.innerHTML = `<div class="loading-state"><p>No hay semanas registradas aún.</p></div>`;
+    if (!filtered.length) {
+        grid.innerHTML = `<div class="loading-state"><p style="font-family:var(--mono);font-size:0.75rem">No hay semanas registradas.</p></div>`;
         return;
     }
 
@@ -1993,21 +2104,33 @@ function renderGrid(semanas) {
         const data = allData[semana];
         const tareas = data?.tareas || {};
         const tareaCount = Object.keys(tareas).length;
+
         const tareasHTML = Object.entries(tareas).map(([k, t]) => {
             const isDisabled = !t.enlace || t.enlace === '#';
-            return `<a href="${isDisabled ? '#' : t.enlace}" 
+            // Si tiene imagen, mostrarla en el link
+            const imgTag = t.imagen
+                ? `<img src="${t.imagen}" style="width:20px;height:20px;object-fit:cover;border:1px solid var(--border);margin-right:2px;" onerror="this.style.display='none'">`
+                : '';
+            return `<a href="${isDisabled ? '#' : t.enlace}"
                        class="tarea-link ${isDisabled ? 'disabled' : ''}"
                        ${!isDisabled ? 'target="_blank" rel="noopener"' : ''}
                        onclick="${isDisabled ? 'return false' : ''}">
-                <span class="tarea-icon">${getFileIcon(t.enlace)}</span>
+                <span class="tarea-icon">${imgTag || getFileIcon(t.enlace)}</span>
                 <span>${t.titulo}</span>
             </a>`;
         }).join('');
 
+        // thumbnail de la semana si alguna tarea tiene imagen
+        const primeraImg = Object.values(tareas).find(t => t.imagen);
+        const thumbHTML = primeraImg
+            ? `<img src="${primeraImg.imagen}" class="card-thumb visible" alt="" onerror="this.classList.remove('visible')">`
+            : '';
+
         return `<div class="semana-card" style="animation-delay:${idx * 0.07}s">
+            ${thumbHTML}
             <div class="card-header">
-                <span class="semana-num">${semana}</span>
-                <span class="semana-count">${tareaCount} trabajo${tareaCount !== 1 ? 's' : ''}</span>
+                <span class="semana-num">⬡ ${semana}</span>
+                <span class="semana-count">${tareaCount} item${tareaCount !== 1 ? 's' : ''}</span>
             </div>
             <div class="card-title">${data?.info || 'Contenido de la semana'}</div>
             <div class="tareas-list">${tareasHTML}</div>
@@ -2017,9 +2140,7 @@ function renderGrid(semanas) {
 
 function animateSkillBars() {
     setTimeout(() => {
-        document.querySelectorAll('.skill-bar div').forEach(bar => {
-            bar.classList.add('animated');
-        });
+        document.querySelectorAll('.skill-bar div').forEach(bar => bar.classList.add('animated'));
     }, 600);
 }
 
@@ -2043,14 +2164,11 @@ function animateCounters() {
 const CREDS = { user: 'phol', pass: 'upla2025' };
 let currentTipo = 'archivo';
 let selectedFile = null;
+let selectedImagen = null;
+let editingItem = null;
 
-function abrirAdmin() {
-    document.getElementById('modalAdmin').classList.add('open');
-}
-
-function cerrarAdmin() {
-    document.getElementById('modalAdmin').classList.remove('open');
-}
+function abrirAdmin() { document.getElementById('modalAdmin').classList.add('open'); }
+function cerrarAdmin() { document.getElementById('modalAdmin').classList.remove('open'); }
 
 function togglePass() {
     const inp = document.getElementById('inputPass');
@@ -2090,21 +2208,19 @@ function switchTab(tab, btn) {
 
 function setTipo(tipo) {
     currentTipo = tipo;
-    document.getElementById('btnTipoArchivo').classList.toggle('active', tipo === 'archivo');
-    document.getElementById('btnTipoLink').classList.toggle('active', tipo === 'link');
-    document.getElementById('zonaArchivo').style.display = tipo === 'archivo' ? 'block' : 'none';
-    document.getElementById('zonaLink').style.display = tipo === 'link' ? 'block' : 'none';
+    ['archivo','link','imagen'].forEach(t => {
+        document.getElementById('btnTipo' + t.charAt(0).toUpperCase() + t.slice(1)).classList.toggle('active', t === tipo);
+        document.getElementById('zona' + t.charAt(0).toUpperCase() + t.slice(1)).style.display = t === tipo ? 'block' : 'none';
+    });
 }
 
-// Drop zone
+// Drop zone archivos
 const dropZone = document.getElementById('dropZone');
 const inputFile = document.getElementById('inputFile');
-
 dropZone?.addEventListener('dragover', e => { e.preventDefault(); dropZone.classList.add('dragover'); });
 dropZone?.addEventListener('dragleave', () => dropZone.classList.remove('dragover'));
 dropZone?.addEventListener('drop', e => {
-    e.preventDefault();
-    dropZone.classList.remove('dragover');
+    e.preventDefault(); dropZone.classList.remove('dragover');
     if (e.dataTransfer.files[0]) handleFile(e.dataTransfer.files[0]);
 });
 inputFile?.addEventListener('change', () => { if (inputFile.files[0]) handleFile(inputFile.files[0]); });
@@ -2115,35 +2231,79 @@ function handleFile(file) {
         `<div class="archivo-preview">📎 ${file.name} <span style="color:var(--text3);margin-left:auto">${(file.size/1024).toFixed(1)} KB</span></div>`;
 }
 
+// Drop zone imágenes
+const dropZoneImg = document.getElementById('dropZoneImg');
+const inputImagen = document.getElementById('inputImagen');
+dropZoneImg?.addEventListener('dragover', e => { e.preventDefault(); dropZoneImg.classList.add('dragover'); });
+dropZoneImg?.addEventListener('dragleave', () => dropZoneImg.classList.remove('dragover'));
+dropZoneImg?.addEventListener('drop', e => {
+    e.preventDefault(); dropZoneImg.classList.remove('dragover');
+    if (e.dataTransfer.files[0]) handleImagen(e.dataTransfer.files[0]);
+});
+inputImagen?.addEventListener('change', () => { if (inputImagen.files[0]) handleImagen(inputImagen.files[0]); });
+
+function handleImagen(file) {
+    selectedImagen = file;
+    const reader = new FileReader();
+    reader.onload = e => {
+        document.getElementById('imagenPreview').innerHTML =
+            `<img src="${e.target.result}" class="img-preview-thumb">
+             <div class="archivo-preview">🖼 ${file.name} <span style="color:var(--text3);margin-left:auto">${(file.size/1024).toFixed(1)} KB</span></div>`;
+    };
+    reader.readAsDataURL(file);
+}
+
 function subirTrabajo() {
     const semana = document.getElementById('admSemana').value;
     const titulo = document.getElementById('admTitulo').value.trim();
     const msg = document.getElementById('uploadMsg');
 
     if (!semana || !titulo) {
-        msg.style.color = '#ff6b6b';
+        msg.style.color = 'var(--red)';
         msg.textContent = '⚠️ Completa todos los campos';
         return;
     }
 
     let enlace = '#';
+    let imagen = null;
+
     if (currentTipo === 'link') {
         enlace = document.getElementById('admEnlace').value.trim() || '#';
+    } else if (currentTipo === 'imagen') {
+        const urlImg = document.getElementById('admImagenUrl').value.trim();
+        if (urlImg) {
+            imagen = urlImg;
+        } else if (selectedImagen) {
+            // Convertir a base64 y guardar como imagen
+            const reader = new FileReader();
+            reader.onload = e => {
+                guardarTrabajo(semana, titulo, '#', e.target.result, msg);
+            };
+            reader.readAsDataURL(selectedImagen);
+            return;
+        }
     }
 
+    guardarTrabajo(semana, titulo, enlace, imagen, msg);
+}
+
+function guardarTrabajo(semana, titulo, enlace, imagen, msg) {
     if (!allData[semana]) allData[semana] = { info: semana, tareas: {} };
     const keys = Object.keys(allData[semana].tareas);
     const newKey = (keys.length + 1).toString();
     allData[semana].tareas[newKey] = { titulo, enlace };
+    if (imagen) allData[semana].tareas[newKey].imagen = imagen;
     saveLocalData(allData);
     renderAll();
 
-    msg.style.color = 'var(--cyan2)';
+    msg.style.color = 'var(--cyan)';
     msg.textContent = '✅ Trabajo publicado correctamente';
     document.getElementById('admTitulo').value = '';
     document.getElementById('admEnlace') && (document.getElementById('admEnlace').value = '');
+    document.getElementById('admImagenUrl') && (document.getElementById('admImagenUrl').value = '');
     document.getElementById('archivoPreview').innerHTML = '';
-    selectedFile = null;
+    document.getElementById('imagenPreview').innerHTML = '';
+    selectedFile = null; selectedImagen = null;
     showToast('Trabajo publicado con éxito');
     setTimeout(() => { msg.textContent = ''; }, 3000);
 }
@@ -2153,27 +2313,114 @@ function cargarListaAdmin() {
     const items = [];
     Object.entries(allData).forEach(([semana, data]) => {
         Object.entries(data.tareas || {}).forEach(([k, t]) => {
-            items.push({ semana, key: k, titulo: t.titulo });
+            items.push({ semana, key: k, titulo: t.titulo, enlace: t.enlace, imagen: t.imagen });
         });
     });
     if (!items.length) {
-        lista.innerHTML = '<p style="color:var(--text3);text-align:center;padding:1rem">No hay trabajos aún</p>';
+        lista.innerHTML = '<p style="color:var(--text3);text-align:center;padding:1rem;font-family:var(--mono);font-size:0.7rem">No hay trabajos aún</p>';
         return;
     }
     lista.innerHTML = items.map((item, i) => `
         <div class="admin-item" id="adminItem_${i}">
             <div class="admin-item-info">
                 <div class="admin-item-title">${item.titulo}</div>
-                <div class="admin-item-semana">${item.semana}</div>
+                <div class="admin-item-semana">⬡ ${item.semana} ${item.imagen ? '· 🖼 imagen' : ''}</div>
             </div>
-            <button class="btn-delete" onclick="eliminarTrabajo('${item.semana}','${item.key}',${i})" title="Eliminar">🗑</button>
+            <div class="admin-item-actions">
+                <button class="btn-edit" onclick="abrirEdicion(${i},'${item.semana}','${item.key}')" title="Editar">✏️</button>
+                <button class="btn-delete" onclick="eliminarTrabajo('${item.semana}','${item.key}',${i})" title="Eliminar">🗑</button>
+            </div>
         </div>`).join('');
+    document.getElementById('editFormContainer').innerHTML = '';
+}
+
+/* ═══════════════════════════════════════════
+   EDICIÓN DE TRABAJOS
+═══════════════════════════════════════════ */
+function abrirEdicion(idx, semana, key) {
+    const t = allData[semana]?.tareas?.[key];
+    if (!t) return;
+
+    editingItem = { semana, key };
+    const container = document.getElementById('editFormContainer');
+
+    container.innerHTML = `
+        <div class="edit-form open" id="editForm">
+            <div style="font-family:var(--font-orb);font-size:0.65rem;color:var(--cyan);letter-spacing:0.1em;margin-bottom:0.5rem">
+                ✏️ EDITANDO: ${semana} — ${t.titulo}
+            </div>
+            <div>
+                <span class="edit-form-label">// Título</span>
+                <input type="text" id="editTitulo" value="${t.titulo}">
+            </div>
+            <div>
+                <span class="edit-form-label">// Enlace URL</span>
+                <input type="url" id="editEnlace" value="${t.enlace !== '#' ? t.enlace : ''}" placeholder="https://...">
+            </div>
+            <div>
+                <span class="edit-form-label">// URL de imagen (opcional)</span>
+                <input type="url" id="editImagen" value="${t.imagen || ''}" placeholder="https://imagen.jpg">
+                ${t.imagen ? `<img src="${t.imagen}" class="img-preview-thumb" style="margin-top:6px" onerror="this.style.display='none'">` : ''}
+            </div>
+            <div>
+                <span class="edit-form-label">// Cambiar semana</span>
+                <select id="editSemana">
+                    ${Array.from({length:16},(_,i)=>`<option value="Semana ${i+1}" ${semana===`Semana ${i+1}`?'selected':''}>Semana ${i+1}</option>`).join('')}
+                </select>
+            </div>
+            <div class="edit-form-row">
+                <button class="btn-save-edit" onclick="guardarEdicion()">💾 Guardar</button>
+                <button class="btn-cancel-edit" onclick="cancelarEdicion()">✕ Cancelar</button>
+            </div>
+        </div>`;
+
+    // Scroll to edit form
+    container.scrollIntoView({ behavior: 'smooth', block: 'start' });
+}
+
+function guardarEdicion() {
+    if (!editingItem) return;
+    const { semana: semanaOrig, key } = editingItem;
+
+    const nuevoTitulo = document.getElementById('editTitulo').value.trim();
+    const nuevoEnlace = document.getElementById('editEnlace').value.trim() || '#';
+    const nuevaImagen = document.getElementById('editImagen').value.trim();
+    const nuevaSemana = document.getElementById('editSemana').value;
+
+    if (!nuevoTitulo) { showToast('El título no puede estar vacío', true); return; }
+
+    const tOrig = allData[semanaOrig].tareas[key];
+    const tareaActualizada = { titulo: nuevoTitulo, enlace: nuevoEnlace };
+    if (nuevaImagen) tareaActualizada.imagen = nuevaImagen;
+
+    // Si cambió de semana, mover
+    if (nuevaSemana !== semanaOrig) {
+        delete allData[semanaOrig].tareas[key];
+        if (!Object.keys(allData[semanaOrig].tareas).length) {
+            // No borramos la semana para mantener su info
+        }
+        if (!allData[nuevaSemana]) allData[nuevaSemana] = { info: nuevaSemana, tareas: {} };
+        const newKey = (Object.keys(allData[nuevaSemana].tareas).length + 1).toString();
+        allData[nuevaSemana].tareas[newKey] = tareaActualizada;
+    } else {
+        allData[semanaOrig].tareas[key] = tareaActualizada;
+    }
+
+    saveLocalData(allData);
+    renderAll();
+    cancelarEdicion();
+    cargarListaAdmin();
+    showToast('✅ Trabajo actualizado');
+}
+
+function cancelarEdicion() {
+    editingItem = null;
+    document.getElementById('editFormContainer').innerHTML = '';
 }
 
 function eliminarTrabajo(semana, key, idx) {
     if (!confirm('¿Eliminar este trabajo?')) return;
     delete allData[semana].tareas[key];
-    if (!Object.keys(allData[semana].tareas).length) delete allData[semana];
     saveLocalData(allData);
     renderAll();
     cargarListaAdmin();
@@ -2254,9 +2501,7 @@ function showTyping() {
     const div = document.createElement('div');
     div.className = 'msg bot'; div.id = 'typingMsg';
     div.innerHTML = `<div class="typing-indicator">
-        <div class="typing-dot"></div>
-        <div class="typing-dot"></div>
-        <div class="typing-dot"></div>
+        <div class="typing-dot"></div><div class="typing-dot"></div><div class="typing-dot"></div>
     </div>`;
     container.appendChild(div);
     container.scrollTop = container.scrollHeight;
@@ -2279,7 +2524,6 @@ async function enviarMensaje() {
     renderMessages();
     showTyping();
 
-    // Build context about the repo
     const repoInfo = Object.entries(allData).map(([sem, data]) => {
         const tareas = Object.values(data.tareas || {}).map(t => t.titulo).join(', ');
         return `${sem}: ${data.info}. Trabajos: ${tareas}`;
@@ -2294,7 +2538,7 @@ INSTRUCCIONES:
 - Responde en español, de forma amigable pero técnica y precisa
 - Usa markdown simple (** para negrita)
 - Cuando pregunten por trabajos, menciona los que hay en el repositorio
-- Si pregunten sobre SQL, BD, triggers, procedimientos almacenados, normalización, etc., da respuestas educativas y útiles
+- Si preguntan sobre SQL, BD, triggers, procedimientos almacenados, normalización, etc., da respuestas educativas y útiles
 - Sé conciso (máximo 150 palabras por respuesta)
 - Eres un asistente académico, no un chatbot genérico`;
 
@@ -2311,7 +2555,7 @@ INSTRUCCIONES:
         });
 
         const data = await response.json();
-        const reply = data.content?.[0]?.text || 'Lo siento, no pude procesar tu mensaje. Intenta de nuevo.';
+        const reply = data.content?.[0]?.text || 'Lo siento, no pude procesar tu mensaje.';
 
         hideTyping();
         chatHistory.push({ role: 'assistant', content: reply });
@@ -2331,14 +2575,14 @@ INSTRUCCIONES:
 
 function getFallbackResponse(text) {
     const t = text.toLowerCase();
-    if (t.includes('trigger')) return '**Trigger (Disparador):** Es un objeto de base de datos que se ejecuta automáticamente cuando ocurre un evento (INSERT, UPDATE, DELETE) en una tabla. Se usa para validaciones, auditorías y automatizaciones.\n\n```sql\nCREATE TRIGGER tr_ejemplo\nON tabla AFTER INSERT\nAS BEGIN\n  -- lógica aquí\nEND```';
-    if (t.includes('procedimiento') || t.includes('stored')) return '**Procedimiento Almacenado:** Es un conjunto de instrucciones SQL precompiladas guardadas en el servidor. Mejoran el rendimiento y la seguridad.\n\n```sql\nCREATE PROCEDURE sp_ejemplo\nAS BEGIN\n  SELECT * FROM tabla\nEND```';
-    if (t.includes('normalización') || t.includes('normalizacion')) return '**Normalización:** Proceso de organizar tablas para reducir redundancia. Las formas normales principales son:\n\n• **1FN**: Sin grupos repetitivos\n• **2FN**: Dependencia completa de la clave primaria\n• **3FN**: Sin dependencias transitivas';
+    if (t.includes('trigger')) return '**Trigger (Disparador):** Es un objeto de base de datos que se ejecuta automáticamente cuando ocurre un evento (INSERT, UPDATE, DELETE) en una tabla.\n\n```sql\nCREATE TRIGGER tr_ejemplo\nON tabla AFTER INSERT\nAS BEGIN\n  -- lógica aquí\nEND```';
+    if (t.includes('procedimiento') || t.includes('stored')) return '**Procedimiento Almacenado:** Conjunto de instrucciones SQL precompiladas guardadas en el servidor. Mejoran rendimiento y seguridad.\n\n```sql\nCREATE PROCEDURE sp_ejemplo\nAS BEGIN\n  SELECT * FROM tabla\nEND```';
+    if (t.includes('normalización') || t.includes('normalizacion')) return '**Normalización:** Proceso de organizar tablas para reducir redundancia.\n\n• **1FN**: Sin grupos repetitivos\n• **2FN**: Dependencia completa de la clave primaria\n• **3FN**: Sin dependencias transitivas';
     if (t.includes('semana') || t.includes('trabajo')) {
         const semanas = Object.keys(allData);
-        return `**Trabajos en el repositorio:**\n\n${semanas.map(s => `📚 **${s}**: ${Object.values(allData[s].tareas || {}).map(t => t.titulo).join(', ')}`).join('\n')}`;
+        return `**Trabajos en el repositorio:**\n\n${semanas.slice(0,5).map(s => `📚 **${s}**: ${Object.values(allData[s].tareas || {}).map(t => t.titulo).join(', ')}`).join('\n')}`;
     }
-    return '¡Buena pregunta! Puedo ayudarte con conceptos de Base de Datos II como SQL, triggers, procedimientos almacenados, normalización, y más. También puedo darte información sobre los trabajos del repositorio. ¿Qué necesitas saber?';
+    return '¡Buena pregunta! Puedo ayudarte con conceptos de Base de Datos II como SQL, triggers, procedimientos almacenados, normalización, y más. ¿Qué necesitas saber?';
 }
 
 /* ═══════════════════════════════════════════
